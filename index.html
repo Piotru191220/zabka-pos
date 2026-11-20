@@ -25,10 +25,7 @@ header {
     align-items: center;
 }
 
-.logo {
-    font-size: 27px;
-    font-weight: bold;
-}
+.logo { font-size: 27px; font-weight: bold; }
 
 button {
     cursor: pointer;
@@ -58,9 +55,7 @@ button {
     box-shadow: 0 5px 20px #0002;
 }
 
-.login-box h2 {
-    color: #008f43;
-}
+.login-box h2 { color: #008f43; }
 
 .login-box input {
     width: 100%;
@@ -77,9 +72,7 @@ button {
     margin-top: 12px;
 }
 
-#error {
-    color: #d00;
-}
+#error, .error { color: #d00; }
 
 #pos {
     display: none;
@@ -109,8 +102,31 @@ button {
     padding: 18px;
 }
 
-.products h2, .cart h2 {
-    margin-top: 0;
+.products h2, .cart h2 { margin-top: 0; }
+
+.scan-area {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.scan-area input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.scan-button {
+    background: #008f43;
+    color: white;
+}
+
+#scanMessage {
+    min-height: 25px;
+    margin-bottom: 10px;
 }
 
 .product-grid {
@@ -128,9 +144,7 @@ button {
     cursor: pointer;
 }
 
-.product:hover {
-    background: #e0f3e7;
-}
+.product:hover { background: #e0f3e7; }
 
 .product .emoji {
     font-size: 35px;
@@ -147,13 +161,14 @@ button {
 .cart-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid #eee;
     padding: 12px 0;
     gap: 8px;
 }
 
 .cart-row button {
-    padding: 4px 8px;
+    padding: 5px 9px;
     background: #eee;
 }
 
@@ -184,12 +199,12 @@ button {
 }
 
 @media(max-width: 800px) {
-    .pos-layout {
-        grid-template-columns: 1fr;
-    }
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .pos-layout { grid-template-columns: 1fr; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width: 400px) {
+    .scan-area { flex-direction: column; }
 }
 </style>
 </head>
@@ -197,25 +212,28 @@ button {
 <body>
 
 <div id="home">
-<header>
-    <div class="logo">ŻABKA</div>
-    <button class="login-button" onclick="showLogin()">
-        Zaloguj się
-    </button>
-</header>
+    <header>
+        <div class="logo">ŻABKA</div>
+        <button class="login-button" onclick="showLogin()">
+            Zaloguj się
+        </button>
+    </header>
 
-<div class="hero">
-    <h1>Witamy w naszym sklepie!</h1>
-    <p>Panel obsługi sklepu i system kasowy POS.</p>
+    <div class="hero">
+        <h1>Witamy w naszym sklepie!</h1>
+        <p>Panel obsługi sklepu i system kasowy POS.</p>
 
-    <div class="login-box" id="loginBox">
-        <h2>Logowanie pracownika</h2>
-        <input id="username" placeholder="Login pracownika">
-        <input id="password" type="password" placeholder="Hasło">
-        <button class="submit" onclick="login()">Zaloguj się</button>
-        <p id="error"></p>
+        <div class="login-box" id="loginBox">
+            <h2>Logowanie pracownika</h2>
+            <input id="username" placeholder="Login pracownika">
+            <input id="password" type="password"
+                   placeholder="Hasło">
+            <button class="submit" onclick="login()">
+                Zaloguj się
+            </button>
+            <p id="error"></p>
+        </div>
     </div>
-</div>
 </div>
 
 <div id="pos">
@@ -229,27 +247,22 @@ button {
 
     <div class="pos-layout">
         <section class="products">
-<h2>Produkty</h2>
+            <h2>Produkty</h2>
 
-<div style="display:flex; gap:8px; margin-bottom:18px;">
-    <input
-        id="barcode"
-        placeholder="Zeskanuj lub wpisz kod produktu..."
-        style="flex:1; padding:13px; border:1px solid #ccc; border-radius:6px;"
-        onkeydown="if(event.key==='Enter') scanProduct()"
-    >
+            <div class="scan-area">
+                <input
+                    id="barcode"
+                    placeholder="Zeskanuj lub wpisz kod produktu..."
+                    onkeydown="if(event.key==='Enter') scanProduct()"
+                >
+                <button class="scan-button" onclick="scanProduct()">
+                    SKANUJ
+                </button>
+            </div>
 
-    <button
-        onclick="scanProduct()"
-        style="background:#008f43;color:white;"
-    >
-        SKANUJ
-    </button>
-</div>
+            <div id="scanMessage"></div>
 
-<div id="scanMessage"></div>
-
-<div class="product-grid" id="productGrid"></div>
+            <div class="product-grid" id="productGrid"></div>
         </section>
 
         <section class="cart">
@@ -279,15 +292,15 @@ button {
 
 <script>
 const products = [
-    {name:"Woda",price:2.99,emoji:"💧"},
-    {name:"Cola",price:5.99,emoji:"🥤"},
-    {name:"Kawa",price:7.99,emoji:"☕"},
-    {name:"Hot Dog",price:8.99,emoji:"🌭"},
-    {name:"Chipsy",price:6.49,emoji:"🍟"},
-    {name:"Kanapka",price:9.99,emoji:"🥪"},
-    {name:"Czekolada",price:4.99,emoji:"🍫"},
-    {name:"Sok",price:4.49,emoji:"🧃"},
-    {name:"Drożdżówka",price:5.49,emoji:"🥐"}
+    {name:"Woda",price:2.99,emoji:"💧",barcode:"590001"},
+    {name:"Cola",price:5.99,emoji:"🥤",barcode:"590002"},
+    {name:"Kawa",price:7.99,emoji:"☕",barcode:"590003"},
+    {name:"Hot Dog",price:8.99,emoji:"🌭",barcode:"590004"},
+    {name:"Chipsy",price:6.49,emoji:"🍟",barcode:"590005"},
+    {name:"Kanapka",price:9.99,emoji:"🥪",barcode:"590006"},
+    {name:"Czekolada",price:4.99,emoji:"🍫",barcode:"590007"},
+    {name:"Sok",price:4.49,emoji:"🧃",barcode:"590008"},
+    {name:"Drożdżówka",price:5.49,emoji:"🥐",barcode:"590009"}
 ];
 
 let cart = [];
@@ -297,13 +310,18 @@ function showLogin() {
 }
 
 function login() {
-    const user = document.getElementById("username").value;
+    const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value;
 
     if(user === "pracownik" && pass === "1234") {
         document.getElementById("home").style.display = "none";
         document.getElementById("pos").style.display = "block";
+        document.getElementById("error").textContent = "";
         renderProducts();
+
+        setTimeout(() => {
+            document.getElementById("barcode").focus();
+        }, 100);
     } else {
         document.getElementById("error").textContent =
             "Nieprawidłowy login lub hasło!";
@@ -312,28 +330,67 @@ function login() {
 
 function logout() {
     cart = [];
+
     document.getElementById("pos").style.display = "none";
     document.getElementById("home").style.display = "block";
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
+    document.getElementById("barcode").value = "";
+    document.getElementById("scanMessage").textContent = "";
+    document.getElementById("message").textContent = "";
+
     renderCart();
 }
 
 function renderProducts() {
     document.getElementById("productGrid").innerHTML =
         products.map((p,i) => `
-        <div class="product" onclick="addProduct(${i})">
-            <span class="emoji">${p.emoji}</span>
-            <strong>${p.name}</strong>
-            <div class="price">${p.price.toFixed(2)} zł</div>
-        </div>
-    `).join("");
+            <div class="product" onclick="addProduct(${i})">
+                <span class="emoji">${p.emoji}</span>
+                <strong>${p.name}</strong>
+                <div class="price">${p.price.toFixed(2)} zł</div>
+            </div>
+        `).join("");
+}
+
+function scanProduct() {
+    const input = document.getElementById("barcode");
+    const code = input.value.trim();
+    const message = document.getElementById("scanMessage");
+
+    if(!code) {
+        message.style.color = "red";
+        message.textContent = "Wpisz kod produktu!";
+        input.focus();
+        return;
+    }
+
+    const product = products.find(p => p.barcode === code);
+
+    if(!product) {
+        message.style.color = "red";
+        message.textContent = "Nie znaleziono produktu: " + code;
+        input.select();
+        return;
+    }
+
+    cart.push(product);
+    renderCart();
+
+    message.style.color = "#008f43";
+    message.textContent = "✓ Dodano: " + product.name;
+
+    input.value = "";
+    input.focus();
 }
 
 function addProduct(i) {
     cart.push(products[i]);
     renderCart();
+
+    document.getElementById("message").textContent =
+        "Dodano: " + products[i].name;
 }
 
 function renderCart() {
@@ -352,6 +409,7 @@ function renderCart() {
     }
 
     const total = cart.reduce((sum,p) => sum + p.price,0);
+
     document.getElementById("total").textContent =
         total.toFixed(2).replace(".",",") + " zł";
 }
@@ -364,6 +422,7 @@ function removeProduct(i) {
 function clearCart() {
     cart = [];
     renderCart();
+
     document.getElementById("message").textContent =
         "Sprzedaż anulowana.";
 }
