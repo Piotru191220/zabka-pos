@@ -229,8 +229,27 @@ button {
 
     <div class="pos-layout">
         <section class="products">
-            <h2>Produkty</h2>
-            <div class="product-grid" id="productGrid"></div>
+<h2>Produkty</h2>
+
+<div style="display:flex; gap:8px; margin-bottom:18px;">
+    <input
+        id="barcode"
+        placeholder="Zeskanuj lub wpisz kod produktu..."
+        style="flex:1; padding:13px; border:1px solid #ccc; border-radius:6px;"
+        onkeydown="if(event.key==='Enter') scanProduct()"
+    >
+
+    <button
+        onclick="scanProduct()"
+        style="background:#008f43;color:white;"
+    >
+        SKANUJ
+    </button>
+</div>
+
+<div id="scanMessage"></div>
+
+<div class="product-grid" id="productGrid"></div>
         </section>
 
         <section class="cart">
