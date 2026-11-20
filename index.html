@@ -79,6 +79,7 @@ input {
     color: #666;
     text-align: center;
     margin-top: 15px;
+    line-height: 1.7;
 }
 
 main { padding: 20px; }
@@ -239,6 +240,44 @@ main { padding: 20px; }
     padding: 30px;
 }
 
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: #f5f7f5;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.stat-card span {
+    display: block;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.stat-card strong {
+    font-size: 25px;
+    color: #008b45;
+}
+
+.manager-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.manager-label {
+    color: #008b45;
+    font-weight: bold;
+}
+
 @media(max-width: 800px) {
     .layout { grid-template-columns: 1fr; }
 }
@@ -273,7 +312,7 @@ main { padding: 20px; }
 </header>
 
 <section id="login">
-    <h2>Logowanie pracownika</h2>
+    <h2>Logowanie</h2>
 
     <input id="username" placeholder="Login">
     <input id="password" type="password" placeholder="Hasło">
@@ -283,9 +322,13 @@ main { padding: 20px; }
     <p id="loginMessage"></p>
 
     <div class="demo-info">
-        Wersja demonstracyjna.<br>
+        Wersja demonstracyjna.<br><br>
+        **PRACOWNIK**<br>
         Login: pracownik<br>
-        Hasło: 1234
+        Hasło: 1234<br><br>
+        **KIEROWNIK**<br>
+        Login: kierownik<br>
+        Hasło: 5678
     </div>
 </section>
 
@@ -298,6 +341,10 @@ main { padding: 20px; }
 
         <button id="historyTab" onclick="showPage('history')">
             HISTORIA SPRZEDAŻY
+        </button>
+
+        <button id="managerTab" class="hidden" onclick="showPage('manager')">
+            PANEL KIEROWNIKA
         </button>
     </div>
 
@@ -373,6 +420,55 @@ main { padding: 20px; }
         </div>
     </section>
 
+    <section id="managerPage" class="hidden">
+        <div class="panel">
+
+            <div class="manager-heading">
+                <h2>Panel kierownika</h2>
+                <span class="manager-label">TRYB KIEROWNIKA</span>
+            </div>
+
+            <p>Podsumowanie wszystkich zapisanych transakcji.</p>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span>Liczba transakcji</span>
+                    <strong id="managerCount">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Łączny utarg</span>
+                    <strong id="managerTotal">0,00 zł</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Sprzedane produkty</span>
+                    <strong id="managerProducts">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Średnia wartość transakcji</span>
+                    <strong id="managerAverage">0,00 zł</strong>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <h3>Podsumowanie płatności</h3>
+
+            <p>Gotówka: <strong id="managerCash">0,00 zł</strong></p>
+            <p>Karta: <strong id="managerCard">0,00 zł</strong></p>
+
+            <hr>
+
+            <h3>Najczęściej sprzedawane produkty</h3>
+            <div id="managerTopProducts"></div>
+
+        </div>
+    </section>
+
 </main>
 
 <script>
@@ -389,6 +485,7 @@ const products = [
 ];
 
 let cart = [];
+let currentRole = "";
 
 function loadHistory() {
     try {
@@ -419,7 +516,7 @@ function saveHistory() {
 }
 
 function money(value) {
-    return value.toFixed(2).replace(".", ",");
+    return Number(value).toFixed(2).replace(".", ",");
 }
 
 function login() {
@@ -427,20 +524,32 @@ function login() {
     const password = document.getElementById("password").value;
 
     if (username === "pracownik" && password === "1234") {
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("app").classList.remove("hidden");
-        document.getElementById("logoutButton").classList.remove("hidden");
-
-        renderProducts();
-        renderCart();
+        currentRole = "pracownik";
+    } else if (username === "kierownik" && password === "5678") {
+        currentRole = "kierownik";
     } else {
         document.getElementById("loginMessage").textContent =
             "Nieprawidłowy login lub hasło!";
+        return;
     }
+
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("logoutButton").classList.remove("hidden");
+
+    document.getElementById("managerTab").classList.toggle(
+        "hidden",
+        currentRole !== "kierownik"
+    );
+
+    showPage("pos");
+    renderProducts();
+    renderCart();
 }
 
 function logout() {
     cart = [];
+    currentRole = "";
 
     document.getElementById("app").classList.add("hidden");
     document.getElementById("login").classList.remove("hidden");
@@ -448,7 +557,10 @@ function logout() {
 
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
+    document.getElementById("loginMessage").textContent = "";
     document.getElementById("barcode").value = "";
+
+    document.getElementById("managerTab").classList.add("hidden");
 
     closeReceipt();
     renderCart();
@@ -628,17 +740,31 @@ function closeReceipt() {
 }
 
 function showPage(page) {
-    const isPos = page === "pos";
-
-    document.getElementById("posPage").classList.toggle("hidden", !isPos);
-    document.getElementById("historyPage").classList.toggle("hidden", isPos);
-
-    document.getElementById("posTab").classList.toggle("active", isPos);
-    document.getElementById("historyTab").classList.toggle("active", !isPos);
-
-    if (!isPos) {
-        renderHistory();
+    if (page === "manager" && currentRole !== "kierownik") {
+        return;
     }
+
+    const pages = ["pos", "history", "manager"];
+
+    pages.forEach(name => {
+        document.getElementById(name + "Page")
+            .classList.toggle("hidden", name !== page);
+    });
+
+    document.getElementById("posTab").classList.toggle(
+        "active", page === "pos"
+    );
+
+    document.getElementById("historyTab").classList.toggle(
+        "active", page === "history"
+    );
+
+    document.getElementById("managerTab").classList.toggle(
+        "active", page === "manager"
+    );
+
+    if (page === "history") renderHistory();
+    if (page === "manager") renderManager();
 }
 
 function renderHistory() {
@@ -648,7 +774,7 @@ function renderHistory() {
     document.getElementById("historyCount").textContent = history.length;
 
     const totalSales = history.reduce(
-        (sum, transaction) => sum + transaction.total, 0
+        (sum, transaction) => sum + Number(transaction.total || 0), 0
     );
 
     document.getElementById("historyTotal").textContent =
@@ -673,7 +799,8 @@ function renderHistory() {
             " | " + transaction.method;
 
         const amount = document.createElement("p");
-        amount.textContent = "Kwota: " + money(transaction.total) + " zł";
+        amount.textContent =
+            "Kwota: " + money(transaction.total) + " zł";
 
         const detailsButton = document.createElement("button");
         detailsButton.textContent = "SZCZEGÓŁY";
@@ -702,6 +829,74 @@ function renderHistory() {
         item.appendChild(details);
 
         container.appendChild(item);
+    });
+}
+
+function renderManager() {
+    const total = history.reduce(
+        (sum, transaction) => sum + Number(transaction.total || 0), 0
+    );
+
+    const productCount = history.reduce(
+        (sum, transaction) => sum +
+            (Array.isArray(transaction.items) ? transaction.items.length : 0),
+        0
+    );
+
+    const cash = history
+        .filter(t => t.method === "Gotówka")
+        .reduce((sum, t) => sum + Number(t.total || 0), 0);
+
+    const card = history
+        .filter(t => t.method === "Karta")
+        .reduce((sum, t) => sum + Number(t.total || 0), 0);
+
+    const average = history.length > 0
+        ? total / history.length
+        : 0;
+
+    document.getElementById("managerCount").textContent =
+        history.length;
+
+    document.getElementById("managerTotal").textContent =
+        money(total) + " zł";
+
+    document.getElementById("managerProducts").textContent =
+        productCount;
+
+    document.getElementById("managerAverage").textContent =
+        money(average) + " zł";
+
+    document.getElementById("managerCash").textContent =
+        money(cash) + " zł";
+
+    document.getElementById("managerCard").textContent =
+        money(card) + " zł";
+
+    const counts = {};
+
+    history.forEach(transaction => {
+        transaction.items.forEach(product => {
+            counts[product.name] = (counts[product.name] || 0) + 1;
+        });
+    });
+
+    const sorted = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1]);
+
+    const container = document.getElementById("managerTopProducts");
+    container.innerHTML = "";
+
+    if (sorted.length === 0) {
+        container.innerHTML =
+            '<p class="empty">Brak sprzedanych produktów.</p>';
+        return;
+    }
+
+    sorted.forEach(([name, count]) => {
+        const line = document.createElement("p");
+        line.textContent = name + " – " + count + " szt.";
+        container.appendChild(line);
     });
 }
 </script>
