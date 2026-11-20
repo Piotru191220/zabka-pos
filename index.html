@@ -4,262 +4,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Żabka POS – System kasowy</title>
+<title>Symulator POS</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #eef1f3;
+    background: #f1f4f6;
     color: #222;
 }
 
 header {
-    background: #008f43;
+    background: #008b45;
     color: white;
     padding: 17px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.logo { font-size: 27px; font-weight: bold; }
+header h1 {
+    margin: 0;
+}
+
+header button {
+    background: white;
+    color: #008b45;
+}
 
 button {
-    cursor: pointer;
     border: none;
-    border-radius: 6px;
-    padding: 12px 17px;
+    border-radius: 7px;
+    padding: 11px 15px;
+    cursor: pointer;
     font-weight: bold;
+    background: #008b45;
+    color: white;
 }
 
-.login-button {
+button:hover {
+    opacity: 0.85;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#login {
+    max-width: 360px;
+    margin: 90px auto;
     background: white;
-    color: #008f43;
-}
-
-.hero {
-    text-align: center;
-    padding: 80px 20px;
-}
-
-.login-box {
-    display: none;
-    background: white;
-    max-width: 370px;
-    margin: 25px auto;
-    padding: 28px;
+    padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 5px 20px #0002;
+    box-shadow: 0 3px 15px #0002;
 }
 
-.login-box h2 { color: #008f43; }
-
-.login-box input {
+#login input {
     width: 100%;
-    padding: 13px;
     margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
 }
 
-.submit {
+#login button {
     width: 100%;
-    background: #008f43;
-    color: white;
-    margin-top: 12px;
+    margin-top: 10px;
 }
 
-#error { color: #d00; }
-
-#pos {
-    display: none;
-    min-height: 100vh;
-    background: #edf0f2;
+.demo-info {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    margin-top: 15px;
 }
 
-.pos-header {
-    background: #008f43;
-    color: white;
-    padding: 16px 22px;
+main {
+    padding: 20px;
+}
+
+.nav {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
-.pos-layout {
+.nav button {
+    background: #555;
+}
+
+.nav button.active {
+    background: #008b45;
+}
+
+.layout {
     display: grid;
-    grid-template-columns: 1fr 370px;
-    gap: 15px;
-    padding: 15px;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
 }
 
-.products, .cart {
+.panel {
     background: white;
-    border-radius: 10px;
-    padding: 18px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px #0001;
 }
 
-.products h2, .cart h2 { margin-top: 0; }
-
-.scan-area {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.scan-area input {
-    flex: 1;
-    min-width: 0;
-    padding: 13px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-}
-
-.scan-button {
-    background: #008f43;
-    color: white;
-}
-
-#scanMessage {
-    min-height: 25px;
-    margin-bottom: 10px;
-}
-
-.product-grid {
+.products {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
     gap: 12px;
 }
 
 .product {
-    background: #f4f6f5;
+    background: #f5f7f5;
+    color: #222;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 18px 8px;
-    text-align: center;
-    cursor: pointer;
+    padding: 15px 8px;
+    min-height: 125px;
 }
 
-.product:hover { background: #e0f3e7; }
-
-.product .emoji {
-    font-size: 35px;
+.product span {
     display: block;
+    font-size: 30px;
     margin-bottom: 8px;
 }
 
-.price {
-    color: #008f43;
-    font-weight: bold;
-    margin-top: 8px;
+.product strong {
+    display: block;
+    margin: 5px 0;
 }
 
-.cart-row {
+.scanner {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.scanner input {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding: 12px 0;
-    gap: 8px;
+    gap: 10px;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
 }
 
-.cart-row button {
-    padding: 5px 9px;
-    background: #eee;
+.remove {
+    background: #d93636;
+    padding: 6px 10px;
 }
 
 .total {
-    font-size: 26px;
+    font-size: 23px;
     font-weight: bold;
-    color: #008f43;
-    text-align: right;
-    margin: 25px 0;
+    margin: 20px 0;
 }
 
-.pay {
-    width: 100%;
-    background: #008f43;
-    color: white;
-    margin-bottom: 9px;
+.pay-buttons {
+    display: flex;
+    gap: 8px;
 }
 
-.clear {
+.pay-buttons button {
+    flex: 1;
+}
+
+.cancel {
+    background: #d93636;
     width: 100%;
-    background: #e9eeee;
+    margin-top: 10px;
 }
 
 #message {
-    text-align: center;
+    color: #008b45;
     font-weight: bold;
-    color: #008f43;
 }
-
-/* PARAGON */
 
 #receiptWindow {
     display: none;
     background: white;
-    color: #222;
-    max-width: 370px;
-    margin: 20px auto;
-    padding: 22px;
-    border: 1px dashed #aaa;
-    border-radius: 5px;
+    border: 1px dashed #777;
+    padding: 20px;
+    margin-top: 20px;
     font-family: monospace;
 }
 
 .receipt-title {
     text-align: center;
-    line-height: 1.5;
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .receipt-line {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    padding: 5px 0;
+    margin: 8px 0;
 }
 
 .receipt-total {
     font-size: 18px;
     font-weight: bold;
+    border-top: 1px dashed black;
+    padding-top: 10px;
 }
 
 .receipt-actions {
     display: flex;
-    flex-direction: column;
     gap: 8px;
-    margin-top: 20px;
-}
-
-.receipt-actions button {
-    width: 100%;
+    margin-top: 15px;
 }
 
 .receipt-close {
-    background: #e9eeee;
+    background: #555;
+}
+
+.history-item {
+    background: #f5f7f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+}
+
+.history-item button {
+    margin-top: 10px;
+}
+
+.history-details {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 7px;
+}
+
+.empty {
+    color: #777;
+    text-align: center;
+    padding: 30px;
 }
 
 @media(max-width: 800px) {
-    .pos-layout { grid-template-columns: 1fr; }
-    .product-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media(max-width: 400px) {
-    .scan-area { flex-direction: column; }
+    .layout {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media print {
     body * {
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
-    #receiptWindow, #receiptWindow * {
-        visibility: visible !important;
+    #receiptWindow,
+    #receiptWindow * {
+        visibility: visible;
     }
 
     #receiptWindow {
@@ -268,10 +282,7 @@ button {
         left: 0;
         top: 0;
         width: 100%;
-        max-width: 100%;
-        margin: 0;
         border: none;
-        box-shadow: none;
     }
 
     .receipt-actions {
@@ -283,134 +294,151 @@ button {
 
 <body>
 
-<div id="home">
-    <header>
-        <div class="logo">ŻABKA</div>
-        <button class="login-button" onclick="showLogin()">
-            Zaloguj się
+<header>
+    <h1>ŻABKA | SYMULATOR POS</h1>
+    <button id="logoutButton" class="hidden" onclick="logout()">WYLOGUJ</button>
+</header>
+
+<section id="login">
+    <h2>Logowanie pracownika</h2>
+
+    <input id="username" placeholder="Login">
+    <input id="password" type="password" placeholder="Hasło">
+
+    <button onclick="login()">ZALOGUJ SIĘ</button>
+
+    <p id="loginMessage"></p>
+
+    <div class="demo-info">
+        Wersja demonstracyjna.<br>
+        Login: pracownik<br>
+        Hasło: 1234
+    </div>
+</section>
+
+<main id="app" class="hidden">
+
+    <div class="nav">
+        <button id="posTab" class="active" onclick="showPage('pos')">
+            KASA
         </button>
-    </header>
 
-    <div class="hero">
-        <h1>Witamy w naszym sklepie!</h1>
-        <p>Panel obsługi sklepu i system kasowy POS.</p>
-
-        <div class="login-box" id="loginBox">
-            <h2>Logowanie pracownika</h2>
-            <input id="username" placeholder="Login pracownika">
-            <input id="password" type="password"
-                   placeholder="Hasło">
-            <button class="submit" onclick="login()">
-                Zaloguj się
-            </button>
-            <p id="error"></p>
-        </div>
-    </div>
-</div>
-
-<div id="pos">
-    <div class="pos-header">
-        <div>
-            <strong>ŻABKA POS</strong>
-            <div>Stanowisko kasowe nr 01</div>
-        </div>
-        <button onclick="logout()">Wyloguj</button>
+        <button id="historyTab" onclick="showPage('history')">
+            HISTORIA SPRZEDAŻY
+        </button>
     </div>
 
-    <div class="pos-layout">
-        <section class="products">
-            <h2>Produkty</h2>
+    <section id="posPage">
 
-            <div class="scan-area">
-                <input
-                    id="barcode"
-                    placeholder="Zeskanuj lub wpisz kod produktu..."
-                    onkeydown="if(event.key==='Enter') scanProduct()"
-                >
-                <button class="scan-button" onclick="scanProduct()">
-                    SKANUJ
+        <div class="layout">
+
+            <div class="panel">
+                <h2>Produkty</h2>
+
+                <div class="scanner">
+                    <input
+                        id="barcode"
+                        placeholder="Zeskanuj kod kreskowy..."
+                        onkeydown="if(event.key === 'Enter') scanProduct()"
+                    >
+
+                    <button onclick="scanProduct()">SKANUJ</button>
+                </div>
+
+                <div class="products" id="products"></div>
+            </div>
+
+            <div class="panel">
+                <h2>Koszyk</h2>
+
+                <div id="cart"></div>
+
+                <div class="total">
+                    SUMA: <span id="total">0,00</span> zł
+                </div>
+
+                <div class="pay-buttons">
+                    <button onclick="pay('Gotówka')">GOTÓWKA</button>
+                    <button onclick="pay('Karta')">KARTA</button>
+                </div>
+
+                <button class="cancel" onclick="clearCart()">
+                    ANULUJ SPRZEDAŻ
                 </button>
-            </div>
 
-            <div id="scanMessage"></div>
-            <div class="product-grid" id="productGrid"></div>
-        </section>
+                <p id="message"></p>
 
-        <section class="cart">
-            <h2>Aktualna sprzedaż</h2>
-            <div id="cartItems">Koszyk jest pusty</div>
+                <div id="receiptWindow">
+                    <div id="receiptContent"></div>
 
-            <div class="total">
-                Razem: <span id="total">0,00 zł</span>
-            </div>
-
-            <button class="pay" onclick="pay('Gotówka')">
-                Płatność gotówką
-            </button>
-
-            <button class="pay" onclick="pay('Karta')">
-                Płatność kartą
-            </button>
-
-            <button class="clear" onclick="clearCart()">
-                Anuluj sprzedaż
-            </button>
-
-            <p id="message"></p>
-
-            <div id="receiptWindow">
-                <div id="receiptContent"></div>
-
-                <div class="receipt-actions">
-                    <button class="pay" onclick="window.print()">
-                        DRUKUJ PARAGON
-                    </button>
-
-                    <button class="receipt-close"
-                    onclick="closeReceipt()">
-                        ZAMKNIJ
-                    </button>
+                    <div class="receipt-actions">
+                        <button onclick="window.print()">DRUKUJ PARAGON</button>
+                        <button class="receipt-close" onclick="closeReceipt()">
+                            ZAMKNIJ
+                        </button>
+                    </div>
                 </div>
             </div>
-        </section>
-    </div>
-</div>
+
+        </div>
+    </section>
+
+    <section id="historyPage" class="hidden">
+        <div class="panel">
+            <h2>Historia sprzedaży</h2>
+
+            <p>
+                Liczba transakcji:
+                <strong id="historyCount">0</strong>
+            </p>
+
+            <p>
+                Łączna wartość sprzedaży:
+                <strong id="historyTotal">0,00 zł</strong>
+            </p>
+
+            <hr>
+
+            <div id="historyList"></div>
+        </div>
+    </section>
+
+</main>
 
 <script>
 const products = [
-    {name:"Woda",price:2.99,emoji:"💧",barcode:"590001"},
-    {name:"Cola",price:5.99,emoji:"🥤",barcode:"590002"},
-    {name:"Kawa",price:7.99,emoji:"☕",barcode:"590003"},
-    {name:"Hot Dog",price:8.99,emoji:"🌭",barcode:"590004"},
-    {name:"Chipsy",price:6.49,emoji:"🍟",barcode:"590005"},
-    {name:"Kanapka",price:9.99,emoji:"🥪",barcode:"590006"},
-    {name:"Czekolada",price:4.99,emoji:"🍫",barcode:"590007"},
-    {name:"Sok",price:4.49,emoji:"🧃",barcode:"590008"},
-    {name:"Drożdżówka",price:5.49,emoji:"🥐",barcode:"590009"}
+    {name: "Woda", price: 2.99, barcode: "590001", emoji: "💧"},
+    {name: "Cola", price: 5.99, barcode: "590002", emoji: "🥤"},
+    {name: "Kawa", price: 7.99, barcode: "590003", emoji: "☕"},
+    {name: "Hot Dog", price: 8.99, barcode: "590004", emoji: "🌭"},
+    {name: "Chipsy", price: 6.49, barcode: "590005", emoji: "🍟"},
+    {name: "Kanapka", price: 9.99, barcode: "590006", emoji: "🥪"},
+    {name: "Czekolada", price: 4.99, barcode: "590007", emoji: "🍫"},
+    {name: "Sok", price: 4.49, barcode: "590008", emoji: "🧃"},
+    {name: "Drożdżówka", price: 5.49, barcode: "590009", emoji: "🥐"}
 ];
 
 let cart = [];
+let history = [];
 let receiptNumber = 1;
 
-function showLogin() {
-    document.getElementById("loginBox").style.display = "block";
+function money(value) {
+    return value.toFixed(2).replace(".", ",");
 }
 
 function login() {
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value;
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-    if(user === "pracownik" && pass === "1234") {
-        document.getElementById("home").style.display = "none";
-        document.getElementById("pos").style.display = "block";
-        document.getElementById("error").textContent = "";
+    if (username === "pracownik" && password === "1234") {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("app").classList.remove("hidden");
+        document.getElementById("logoutButton").classList.remove("hidden");
+
         renderProducts();
-
-        setTimeout(() => {
-            document.getElementById("barcode").focus();
-        }, 100);
+        renderCart();
     } else {
-        document.getElementById("error").textContent =
+        document.getElementById("loginMessage").textContent =
             "Nieprawidłowy login lub hasło!";
     }
 }
@@ -418,93 +446,95 @@ function login() {
 function logout() {
     cart = [];
 
-    document.getElementById("pos").style.display = "none";
-    document.getElementById("home").style.display = "block";
-    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("app").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+    document.getElementById("logoutButton").classList.add("hidden");
+
     document.getElementById("username").value = "";
     document.getElementById("password").value = "";
     document.getElementById("barcode").value = "";
-    document.getElementById("scanMessage").textContent = "";
-    document.getElementById("message").textContent = "";
-    closeReceipt();
 
+    closeReceipt();
     renderCart();
 }
 
 function renderProducts() {
-    document.getElementById("productGrid").innerHTML =
-        products.map((p,i) => `
-            <div class="product" onclick="addProduct(${i})">
-                <span class="emoji">${p.emoji}</span>
-                <strong>${p.name}</strong>
-                <div class="price">${p.price.toFixed(2)} zł</div>
-            </div>
-        `).join("");
+    const container = document.getElementById("products");
+    container.innerHTML = "";
+
+    products.forEach(product => {
+        const button = document.createElement("button");
+        button.className = "product";
+
+        button.innerHTML = `
+            <span>${product.emoji}</span>
+            <strong>${product.name}</strong>
+            ${money(product.price)} zł
+        `;
+
+        button.onclick = () => addProduct(product);
+        container.appendChild(button);
+    });
 }
 
-function scanProduct() {
-    const input = document.getElementById("barcode");
-    const code = input.value.trim();
-    const message = document.getElementById("scanMessage");
-
-    if(!code) {
-        message.style.color = "red";
-        message.textContent = "Wpisz kod produktu!";
-        input.focus();
-        return;
-    }
-
-    const product = products.find(p => p.barcode === code);
-
-    if(!product) {
-        message.style.color = "red";
-        message.textContent = "Nie znaleziono produktu: " + code;
-        input.select();
-        return;
-    }
-
-    cart.push(product);
-    renderCart();
-
-    message.style.color = "#008f43";
-    message.textContent = "✓ Dodano: " + product.name;
-
-    input.value = "";
-    input.focus();
-}
-
-function addProduct(i) {
-    cart.push(products[i]);
+function addProduct(product) {
+    cart.push({...product});
     renderCart();
 
     document.getElementById("message").textContent =
-        "Dodano: " + products[i].name;
+        "Dodano: " + product.name;
+}
+
+function scanProduct() {
+    const code = document.getElementById("barcode").value.trim();
+
+    const product = products.find(p => p.barcode === code);
+
+    if (product) {
+        addProduct(product);
+        document.getElementById("barcode").value = "";
+    } else {
+        document.getElementById("message").textContent =
+            "Nie znaleziono produktu!";
+    }
+}
+
+function removeProduct(index) {
+    cart.splice(index, 1);
+    renderCart();
 }
 
 function renderCart() {
-    const box = document.getElementById("cartItems");
+    const container = document.getElementById("cart");
+    container.innerHTML = "";
 
-    if(cart.length === 0) {
-        box.textContent = "Koszyk jest pusty";
-    } else {
-        box.innerHTML = cart.map((p,i) => `
-            <div class="cart-row">
-                <span>${p.name}</span>
-                <span>${p.price.toFixed(2)} zł</span>
-                <button onclick="removeProduct(${i})">✕</button>
-            </div>
-        `).join("");
+    let total = 0;
+
+    if (cart.length === 0) {
+        container.innerHTML = '<p class="empty">Koszyk jest pusty</p>';
     }
 
-    const total = cart.reduce((sum,p) => sum + p.price,0);
+    cart.forEach((product, index) => {
+        total += product.price;
 
-    document.getElementById("total").textContent =
-        total.toFixed(2).replace(".",",") + " zł";
-}
+        const item = document.createElement("div");
+        item.className = "cart-item";
 
-function removeProduct(i) {
-    cart.splice(i,1);
-    renderCart();
+        const name = document.createElement("span");
+        name.textContent = product.name + " – " + money(product.price) + " zł";
+
+        const remove = document.createElement("button");
+        remove.className = "remove";
+        remove.textContent = "X";
+        remove.onclick = () => removeProduct(index);
+
+        item.appendChild(name);
+        item.appendChild(remove);
+
+        container.appendChild(item);
+    });
+
+    document.getElementById("total").textContent = money(total);
 }
 
 function clearCart() {
@@ -516,73 +546,165 @@ function clearCart() {
 }
 
 function pay(method) {
-    if(cart.length === 0) {
+    if (cart.length === 0) {
         document.getElementById("message").textContent =
             "Koszyk jest pusty!";
         return;
     }
 
-    const soldItems = [...cart];
-    const total = soldItems.reduce((sum,p) => sum + p.price,0);
+    const soldItems = cart.map(item => ({...item}));
 
-    const date = new Date();
-    const dateText = date.toLocaleDateString("pl-PL");
-    const timeText = date.toLocaleTimeString("pl-PL");
+    const total = soldItems.reduce(
+        (sum, item) => sum + item.price, 0
+    );
 
-    const items = soldItems.map(p => `
-        <div class="receipt-line">
-            <span>${p.name}</span>
-            <span>${p.price.toFixed(2)} zł</span>
-        </div>
-    `).join("");
+    const now = new Date();
 
-    document.getElementById("receiptContent").innerHTML = `
-        <div class="receipt-title">
-            <h2>ŻABKA</h2>
-            <p>SKLEP DEMONSTRACYJNY</p>
-            <p>PARAGON – SYMULACJA</p>
-        </div>
+    const transaction = {
+        number: receiptNumber,
+        date: now.toLocaleDateString("pl-PL"),
+        time: now.toLocaleTimeString("pl-PL"),
+        method: method,
+        items: soldItems,
+        total: total
+    };
 
-        <hr>
+    history.unshift(transaction);
 
-        <p>Numer paragonu: ${String(receiptNumber).padStart(4,"0")}</p>
-        <p>Data: ${dateText}</p>
-        <p>Godzina: ${timeText}</p>
-        <p>Stanowisko: 01</p>
-
-        <hr>
-
-        ${items}
-
-        <hr>
-
-        <div class="receipt-line receipt-total">
-            <span>RAZEM:</span>
-            <span>${total.toFixed(2)} zł</span>
-        </div>
-
-        <p>Forma płatności: ${method}</p>
-
-        <hr>
-
-        <div class="receipt-title">
-            <p>DZIĘKUJEMY ZA ZAKUPY!</p>
-            <p>To nie jest dokument fiskalny.</p>
-        </div>
-    `;
-
-    document.getElementById("receiptWindow").style.display = "block";
+    showReceipt(transaction);
 
     receiptNumber++;
+
     cart = [];
     renderCart();
 
     document.getElementById("message").textContent =
-        "Sprzedaż zakończona pomyślnie!";
+        "Płatność zakończona pomyślnie!";
+}
+
+function showReceipt(transaction) {
+    const content = document.getElementById("receiptContent");
+
+    let html = `
+        <div class="receipt-title">SYMULATOR POS</div>
+        <p style="text-align:center">PARAGON DEMONSTRACYJNY</p>
+        <hr>
+        Numer: ${transaction.number}<br>
+        Data: ${transaction.date}<br>
+        Godzina: ${transaction.time}<br>
+        Stanowisko: 1
+        <hr>
+    `;
+
+    transaction.items.forEach(item => {
+        html += `
+            <div class="receipt-line">
+                <span>${item.name}</span>
+                <span>${money(item.price)} zł</span>
+            </div>
+        `;
+    });
+
+    html += `
+        <hr>
+        <div class="receipt-total">
+            RAZEM: ${money(transaction.total)} zł
+        </div>
+        <p>Płatność: ${transaction.method}</p>
+        <hr>
+        <p style="text-align:center">
+            DZIĘKUJEMY ZA ZAKUPY!
+        </p>
+        <p style="text-align:center;font-size:12px">
+            To nie jest dokument fiskalny.
+        </p>
+    `;
+
+    content.innerHTML = html;
+
+    document.getElementById("receiptWindow").style.display = "block";
 }
 
 function closeReceipt() {
     document.getElementById("receiptWindow").style.display = "none";
+}
+
+function showPage(page) {
+    const isPos = page === "pos";
+
+    document.getElementById("posPage").classList.toggle("hidden", !isPos);
+    document.getElementById("historyPage").classList.toggle("hidden", isPos);
+
+    document.getElementById("posTab").classList.toggle("active", isPos);
+    document.getElementById("historyTab").classList.toggle("active", !isPos);
+
+    if (!isPos) {
+        renderHistory();
+    }
+}
+
+function renderHistory() {
+    const container = document.getElementById("historyList");
+    container.innerHTML = "";
+
+    document.getElementById("historyCount").textContent = history.length;
+
+    const totalSales = history.reduce(
+        (sum, transaction) => sum + transaction.total, 0
+    );
+
+    document.getElementById("historyTotal").textContent =
+        money(totalSales) + " zł";
+
+    if (history.length === 0) {
+        container.innerHTML =
+            '<div class="empty">Nie ma jeszcze żadnych transakcji.</div>';
+        return;
+    }
+
+    history.forEach((transaction, index) => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+
+        const heading = document.createElement("strong");
+        heading.textContent = "Transakcja #" + transaction.number;
+
+        const info = document.createElement("p");
+        info.textContent =
+            transaction.date + " | " + transaction.time +
+            " | " + transaction.method;
+
+        const amount = document.createElement("p");
+        amount.textContent = "Kwota: " + money(transaction.total) + " zł";
+
+        const detailsButton = document.createElement("button");
+        detailsButton.textContent = "SZCZEGÓŁY";
+
+        const details = document.createElement("div");
+        details.className = "history-details hidden";
+
+        transaction.items.forEach(product => {
+            const line = document.createElement("p");
+            line.textContent =
+                product.name + " – " + money(product.price) + " zł";
+            details.appendChild(line);
+        });
+
+        detailsButton.onclick = () => {
+            details.classList.toggle("hidden");
+            detailsButton.textContent = details.classList.contains("hidden")
+                ? "SZCZEGÓŁY"
+                : "UKRYJ SZCZEGÓŁY";
+        };
+
+        item.appendChild(heading);
+        item.appendChild(info);
+        item.appendChild(amount);
+        item.appendChild(detailsButton);
+        item.appendChild(details);
+
+        container.appendChild(item);
+    });
 }
 </script>
 
