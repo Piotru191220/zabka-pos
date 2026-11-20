@@ -1,114 +1,202 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Żabka POS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Żabka POS – System kasowy</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f3f5f3;
+    background: #eef1f3;
     color: #222;
 }
 
 header {
-    background: #009640;
+    background: #008f43;
     color: white;
-    padding: 22px 8%;
+    padding: 17px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .logo {
-    font-size: 30px;
+    font-size: 27px;
     font-weight: bold;
 }
 
 button {
     cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 17px;
+    font-weight: bold;
 }
 
 .login-button {
     background: white;
-    color: #009640;
-    border: none;
-    padding: 13px 25px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
+    color: #008f43;
 }
 
 .hero {
     text-align: center;
-    padding: 100px 20px;
-}
-
-.hero h1 {
-    font-size: 42px;
-}
-
-.hero p {
-    color: #666;
-    font-size: 18px;
+    padding: 80px 20px;
 }
 
 .login-box {
     display: none;
     background: white;
-    max-width: 380px;
-    margin: 30px auto;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px #0001;
+    max-width: 370px;
+    margin: 25px auto;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px #0002;
 }
 
 .login-box h2 {
-    text-align: center;
-    color: #009640;
+    color: #008f43;
 }
 
 .login-box input {
     width: 100%;
     padding: 13px;
-    margin: 10px 0;
+    margin: 8px 0;
     border: 1px solid #ccc;
-    border-radius: 7px;
-    font-size: 15px;
+    border-radius: 6px;
 }
 
-.submit-button {
+.submit {
     width: 100%;
-    padding: 14px;
-    background: #009640;
+    background: #008f43;
     color: white;
-    border: none;
-    border-radius: 7px;
-    font-size: 16px;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 #error {
-    color: red;
-    text-align: center;
+    color: #d00;
 }
 
-footer {
+#pos {
+    display: none;
+    min-height: 100vh;
+    background: #edf0f2;
+}
+
+.pos-header {
+    background: #008f43;
+    color: white;
+    padding: 16px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pos-layout {
+    display: grid;
+    grid-template-columns: 1fr 370px;
+    gap: 15px;
+    padding: 15px;
+}
+
+.products, .cart {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.products h2, .cart h2 {
+    margin-top: 0;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.product {
+    background: #f4f6f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 18px 8px;
     text-align: center;
-    padding: 25px;
-    color: #777;
+    cursor: pointer;
+}
+
+.product:hover {
+    background: #e0f3e7;
+}
+
+.product .emoji {
+    font-size: 35px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.price {
+    color: #008f43;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.cart-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+    gap: 8px;
+}
+
+.cart-row button {
+    padding: 4px 8px;
+    background: #eee;
+}
+
+.total {
+    font-size: 26px;
+    font-weight: bold;
+    color: #008f43;
+    text-align: right;
+    margin: 25px 0;
+}
+
+.pay {
+    width: 100%;
+    background: #008f43;
+    color: white;
+    margin-bottom: 9px;
+}
+
+.clear {
+    width: 100%;
+    background: #e9eeee;
+}
+
+#message {
+    text-align: center;
+    font-weight: bold;
+    color: #008f43;
+}
+
+@media(max-width: 800px) {
+    .pos-layout {
+        grid-template-columns: 1fr;
+    }
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 </style>
 </head>
 
 <body>
 
+<div id="home">
 <header>
     <div class="logo">ŻABKA</div>
     <button class="login-button" onclick="showLogin()">
@@ -116,39 +204,171 @@ footer {
     </button>
 </header>
 
-<main class="hero">
+<div class="hero">
     <h1>Witamy w naszym sklepie!</h1>
     <p>Panel obsługi sklepu i system kasowy POS.</p>
 
     <div class="login-box" id="loginBox">
         <h2>Logowanie pracownika</h2>
-
-        <input type="text" id="username"
-        placeholder="Login pracownika">
-
-        <input type="password" id="password"
-        placeholder="Hasło">
-
-        <button class="submit-button" onclick="login()">
-            Zaloguj się
-        </button>
-
+        <input id="username" placeholder="Login pracownika">
+        <input id="password" type="password" placeholder="Hasło">
+        <button class="submit" onclick="login()">Zaloguj się</button>
         <p id="error"></p>
     </div>
-</main>
+</div>
+</div>
 
-<footer>
-    © 2026 Żabka POS – projekt demonstracyjny
-</footer>
+<div id="pos">
+    <div class="pos-header">
+        <div>
+            <strong>ŻABKA POS</strong>
+            <div>Stanowisko kasowe nr 01</div>
+        </div>
+        <button onclick="logout()">Wyloguj</button>
+    </div>
+
+    <div class="pos-layout">
+        <section class="products">
+            <h2>Produkty</h2>
+            <div class="product-grid" id="productGrid"></div>
+        </section>
+
+        <section class="cart">
+            <h2>Aktualna sprzedaż</h2>
+            <div id="cartItems">Koszyk jest pusty</div>
+
+            <div class="total">
+                Razem: <span id="total">0,00 zł</span>
+            </div>
+
+            <button class="pay" onclick="pay('Gotówka')">
+                Płatność gotówką
+            </button>
+
+            <button class="pay" onclick="pay('Karta')">
+                Płatność kartą
+            </button>
+
+            <button class="clear" onclick="clearCart()">
+                Anuluj sprzedaż
+            </button>
+
+            <p id="message"></p>
+        </section>
+    </div>
+</div>
 
 <script>
+const products = [
+    {name:"Woda",price:2.99,emoji:"💧"},
+    {name:"Cola",price:5.99,emoji:"🥤"},
+    {name:"Kawa",price:7.99,emoji:"☕"},
+    {name:"Hot Dog",price:8.99,emoji:"🌭"},
+    {name:"Chipsy",price:6.49,emoji:"🍟"},
+    {name:"Kanapka",price:9.99,emoji:"🥪"},
+    {name:"Czekolada",price:4.99,emoji:"🍫"},
+    {name:"Sok",price:4.49,emoji:"🧃"},
+    {name:"Drożdżówka",price:5.49,emoji:"🥐"}
+];
+
+let cart = [];
+
 function showLogin() {
     document.getElementById("loginBox").style.display = "block";
 }
 
 function login() {
-    document.getElementById("error").textContent =
-        "System logowania zostanie skonfigurowany w kolejnym kroku.";
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+
+    if(user === "pracownik" && pass === "1234") {
+        document.getElementById("home").style.display = "none";
+        document.getElementById("pos").style.display = "block";
+        renderProducts();
+    } else {
+        document.getElementById("error").textContent =
+            "Nieprawidłowy login lub hasło!";
+    }
+}
+
+function logout() {
+    cart = [];
+    document.getElementById("pos").style.display = "none";
+    document.getElementById("home").style.display = "block";
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    renderCart();
+}
+
+function renderProducts() {
+    document.getElementById("productGrid").innerHTML =
+        products.map((p,i) => `
+        <div class="product" onclick="addProduct(${i})">
+            <span class="emoji">${p.emoji}</span>
+            <strong>${p.name}</strong>
+            <div class="price">${p.price.toFixed(2)} zł</div>
+        </div>
+    `).join("");
+}
+
+function addProduct(i) {
+    cart.push(products[i]);
+    renderCart();
+}
+
+function renderCart() {
+    const box = document.getElementById("cartItems");
+
+    if(cart.length === 0) {
+        box.textContent = "Koszyk jest pusty";
+    } else {
+        box.innerHTML = cart.map((p,i) => `
+            <div class="cart-row">
+                <span>${p.name}</span>
+                <span>${p.price.toFixed(2)} zł</span>
+                <button onclick="removeProduct(${i})">✕</button>
+            </div>
+        `).join("");
+    }
+
+    const total = cart.reduce((sum,p) => sum + p.price,0);
+    document.getElementById("total").textContent =
+        total.toFixed(2).replace(".",",") + " zł";
+}
+
+function removeProduct(i) {
+    cart.splice(i,1);
+    renderCart();
+}
+
+function clearCart() {
+    cart = [];
+    renderCart();
+    document.getElementById("message").textContent =
+        "Sprzedaż anulowana.";
+}
+
+function pay(method) {
+    if(cart.length === 0) {
+        document.getElementById("message").textContent =
+            "Koszyk jest pusty!";
+        return;
+    }
+
+    const total = cart.reduce((sum,p) => sum + p.price,0);
+
+    alert(
+        "SPRZEDAŻ ZAKOŃCZONA\n\n" +
+        "Kwota: " + total.toFixed(2) + " zł\n" +
+        "Płatność: " + method
+    );
+
+    cart = [];
+    renderCart();
+
+    document.getElementById("message").textContent =
+        "Sprzedaż zakończona pomyślnie!";
 }
 </script>
 
