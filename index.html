@@ -7,9 +7,7 @@
 <title>Symulator POS</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -29,9 +27,7 @@ header {
     gap: 12px;
 }
 
-header h1 {
-    margin: 0;
-}
+header h1 { margin: 0; }
 
 header button {
     background: white;
@@ -48,9 +44,7 @@ button {
     color: white;
 }
 
-button:hover {
-    opacity: 0.85;
-}
+button:hover { opacity: 0.85; }
 
 input {
     padding: 12px;
@@ -59,9 +53,7 @@ input {
     font-size: 16px;
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 #login {
     max-width: 360px;
@@ -89,9 +81,7 @@ input {
     margin-top: 15px;
 }
 
-main {
-    padding: 20px;
-}
+main { padding: 20px; }
 
 .nav {
     display: flex;
@@ -100,13 +90,8 @@ main {
     margin-bottom: 20px;
 }
 
-.nav button {
-    background: #555;
-}
-
-.nav button.active {
-    background: #008b45;
-}
+.nav button { background: #555; }
+.nav button.active { background: #008b45; }
 
 .layout {
     display: grid;
@@ -181,9 +166,7 @@ main {
     gap: 8px;
 }
 
-.pay-buttons button {
-    flex: 1;
-}
+.pay-buttons button { flex: 1; }
 
 .cancel {
     background: #d93636;
@@ -231,9 +214,7 @@ main {
     margin-top: 15px;
 }
 
-.receipt-close {
-    background: #555;
-}
+.receipt-close { background: #555; }
 
 .history-item {
     background: #f5f7f5;
@@ -243,9 +224,7 @@ main {
     border: 1px solid #ddd;
 }
 
-.history-item button {
-    margin-top: 10px;
-}
+.history-item button { margin-top: 10px; }
 
 .history-details {
     margin-top: 10px;
@@ -261,15 +240,11 @@ main {
 }
 
 @media(max-width: 800px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
+    .layout { grid-template-columns: 1fr; }
 }
 
 @media print {
-    body * {
-        visibility: hidden;
-    }
+    body * { visibility: hidden; }
 
     #receiptWindow,
     #receiptWindow * {
@@ -285,9 +260,7 @@ main {
         border: none;
     }
 
-    .receipt-actions {
-        display: none !important;
-    }
+    .receipt-actions { display: none !important; }
 }
 </style>
 </head>
@@ -329,7 +302,6 @@ main {
     </div>
 
     <section id="posPage">
-
         <div class="layout">
 
             <div class="panel">
@@ -341,7 +313,6 @@ main {
                         placeholder="Zeskanuj kod kreskowy..."
                         onkeydown="if(event.key === 'Enter') scanProduct()"
                     >
-
                     <button onclick="scanProduct()">SKANUJ</button>
                 </div>
 
@@ -379,7 +350,6 @@ main {
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -419,8 +389,34 @@ const products = [
 ];
 
 let cart = [];
-let history = [];
-let receiptNumber = 1;
+
+function loadHistory() {
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem("posHistory") || "[]"
+        );
+
+        return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+let history = loadHistory();
+
+let receiptNumber = history.length > 0
+    ? Math.max(...history.map(t => Number(t.number) || 0)) + 1
+    : 1;
+
+function saveHistory() {
+    try {
+        localStorage.setItem("posHistory", JSON.stringify(history));
+        return true;
+    } catch (error) {
+        alert("Nie udało się zapisać historii sprzedaży.");
+        return false;
+    }
+}
 
 function money(value) {
     return value.toFixed(2).replace(".", ",");
@@ -487,7 +483,6 @@ function addProduct(product) {
 
 function scanProduct() {
     const code = document.getElementById("barcode").value.trim();
-
     const product = products.find(p => p.barcode === code);
 
     if (product) {
@@ -530,7 +525,6 @@ function renderCart() {
 
         item.appendChild(name);
         item.appendChild(remove);
-
         container.appendChild(item);
     });
 
@@ -570,6 +564,11 @@ function pay(method) {
     };
 
     history.unshift(transaction);
+
+    if (!saveHistory()) {
+        history.shift();
+        return;
+    }
 
     showReceipt(transaction);
 
@@ -621,7 +620,6 @@ function showReceipt(transaction) {
     `;
 
     content.innerHTML = html;
-
     document.getElementById("receiptWindow").style.display = "block";
 }
 
@@ -662,7 +660,7 @@ function renderHistory() {
         return;
     }
 
-    history.forEach((transaction, index) => {
+    history.forEach(transaction => {
         const item = document.createElement("div");
         item.className = "history-item";
 
