@@ -51,6 +51,7 @@ input {
     border: 1px solid #ccc;
     border-radius: 7px;
     font-size: 16px;
+    width: 100%;
 }
 
 .hidden { display: none !important; }
@@ -105,6 +106,7 @@ main { padding: 20px; }
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 2px 10px #0001;
+    margin-bottom: 20px;
 }
 
 .products {
@@ -278,8 +280,79 @@ main { padding: 20px; }
     font-weight: bold;
 }
 
+.product-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+}
+
+.secondary {
+    background: #555;
+}
+
+.product-manager-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    background: #f8faf8;
+}
+
+.product-manager-info {
+    min-width: 150px;
+    flex: 1;
+}
+
+.product-manager-info p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.product-manager-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.edit-button { background: #2878bd; }
+.delete-button { background: #d93636; }
+
+#productMessage {
+    font-weight: bold;
+    color: #008b45;
+}
+
 @media(max-width: 800px) {
     .layout { grid-template-columns: 1fr; }
+}
+
+@media(max-width: 500px) {
+    .product-form { grid-template-columns: 1fr; }
+    .form-buttons { grid-column: 1; }
 }
 
 @media print {
@@ -323,10 +396,10 @@ main { padding: 20px; }
 
     <div class="demo-info">
         Wersja demonstracyjna.<br><br>
-        **PRACOWNIK**<br>
+        PRACOWNIK<br>
         Login: pracownik<br>
         Hasło: 1234<br><br>
-        **KIEROWNIK**<br>
+        KIEROWNIK<br>
         Login: kierownik<br>
         Hasło: 5678
     </div>
@@ -421,6 +494,7 @@ main { padding: 20px; }
     </section>
 
     <section id="managerPage" class="hidden">
+
         <div class="panel">
 
             <div class="manager-heading">
@@ -467,12 +541,82 @@ main { padding: 20px; }
             <div id="managerTopProducts"></div>
 
         </div>
+
+        <!-- ZARZĄDZANIE PRODUKTAMI -->
+
+        <div class="panel">
+
+            <h2>Zarządzanie produktami</h2>
+
+            <p>Dodawaj, edytuj i usuwaj produkty dostępne na kasie.</p>
+
+            <h3 id="productFormTitle">Dodaj nowy produkt</h3>
+
+            <div class="product-form">
+
+                <div class="form-field">
+                    <label for="productName">Nazwa produktu</label>
+                    <input id="productName" placeholder="Np. Woda">
+                </div>
+
+                <div class="form-field">
+                    <label for="productPrice">Cena (zł)</label>
+                    <input
+                        id="productPrice"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Np. 3.99"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="productBarcode">Kod kreskowy</label>
+                    <input id="productBarcode" placeholder="Np. 590010">
+                </div>
+
+                <div class="form-field">
+                    <label for="productEmoji">Emoji</label>
+                    <input id="productEmoji" placeholder="Np. 🥤">
+                </div>
+
+                <div class="form-buttons">
+                    <button onclick="saveProduct()">ZAPISZ PRODUKT</button>
+                    <button
+                        id="cancelEditButton"
+                        class="secondary hidden"
+                        onclick="cancelProductEdit()"
+                    >
+                        ANULUJ EDYCJĘ
+                    </button>
+                </div>
+
+            </div>
+
+            <p id="productMessage"></p>
+
+            <hr>
+
+            <h3>Lista produktów</h3>
+
+            <p>
+                Liczba produktów:
+                <strong id="productCount">0</strong>
+            </p>
+
+            <div id="managerProductList"></div>
+
+        </div>
+
     </section>
 
 </main>
 
 <script>
-const products = [
+
+// DOMYŚLNE PRODUKTY
+
+const defaultProducts = [
     {name: "Woda", price: 2.99, barcode: "590001", emoji: "💧"},
     {name: "Cola", price: 5.99, barcode: "590002", emoji: "🥤"},
     {name: "Kawa", price: 7.99, barcode: "590003", emoji: "☕"},
@@ -484,8 +628,53 @@ const products = [
     {name: "Drożdżówka", price: 5.49, barcode: "590009", emoji: "🥐"}
 ];
 
+let products = loadProducts();
 let cart = [];
 let currentRole = "";
+let editingProductIndex = -1;
+
+
+// PRODUKTY - ZAPIS I ODCZYT
+
+function loadProducts() {
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem("posProducts") || "null"
+        );
+
+        if (!Array.isArray(saved)) {
+            return defaultProducts.map(p => ({...p}));
+        }
+
+        return saved.filter(p =>
+            p &&
+            typeof p.name === "string" &&
+            Number.isFinite(Number(p.price)) &&
+            typeof p.barcode === "string"
+        ).map(p => ({
+            name: p.name,
+            price: Number(p.price),
+            barcode: p.barcode,
+            emoji: typeof p.emoji === "string" ? p.emoji : "🛒"
+        }));
+
+    } catch (error) {
+        return defaultProducts.map(p => ({...p}));
+    }
+}
+
+function saveProducts() {
+    try {
+        localStorage.setItem("posProducts", JSON.stringify(products));
+        return true;
+    } catch (error) {
+        alert("Nie udało się zapisać listy produktów.");
+        return false;
+    }
+}
+
+
+// HISTORIA SPRZEDAŻY
 
 function loadHistory() {
     try {
@@ -515,9 +704,25 @@ function saveHistory() {
     }
 }
 
+
+// POMOCNICZE
+
 function money(value) {
     return Number(value).toFixed(2).replace(".", ",");
 }
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[char]);
+}
+
+
+// LOGOWANIE
 
 function login() {
     const username = document.getElementById("username").value;
@@ -562,9 +767,13 @@ function logout() {
 
     document.getElementById("managerTab").classList.add("hidden");
 
+    cancelProductEdit();
     closeReceipt();
     renderCart();
 }
+
+
+// KASA I PRODUKTY
 
 function renderProducts() {
     const container = document.getElementById("products");
@@ -574,15 +783,28 @@ function renderProducts() {
         const button = document.createElement("button");
         button.className = "product";
 
-        button.innerHTML = `
-            <span>${product.emoji}</span>
-            <strong>${product.name}</strong>
-            ${money(product.price)} zł
-        `;
+        const emoji = document.createElement("span");
+        emoji.textContent = product.emoji;
+
+        const name = document.createElement("strong");
+        name.textContent = product.name;
+
+        const price = document.createElement("div");
+        price.textContent = money(product.price) + " zł";
+
+        button.appendChild(emoji);
+        button.appendChild(name);
+        button.appendChild(price);
 
         button.onclick = () => addProduct(product);
+
         container.appendChild(button);
     });
+
+    if (products.length === 0) {
+        container.innerHTML =
+            '<p class="empty">Brak produktów. Dodaj je w panelu kierownika.</p>';
+    }
 }
 
 function addProduct(product) {
@@ -651,6 +873,9 @@ function clearCart() {
         "Sprzedaż anulowana.";
 }
 
+
+// PŁATNOŚĆ
+
 function pay(method) {
     if (cart.length === 0) {
         document.getElementById("message").textContent =
@@ -710,7 +935,7 @@ function showReceipt(transaction) {
     transaction.items.forEach(item => {
         html += `
             <div class="receipt-line">
-                <span>${item.name}</span>
+                <span>${escapeHtml(item.name)}</span>
                 <span>${money(item.price)} zł</span>
             </div>
         `;
@@ -721,7 +946,7 @@ function showReceipt(transaction) {
         <div class="receipt-total">
             RAZEM: ${money(transaction.total)} zł
         </div>
-        <p>Płatność: ${transaction.method}</p>
+        <p>Płatność: ${escapeHtml(transaction.method)}</p>
         <hr>
         <p style="text-align:center">
             DZIĘKUJEMY ZA ZAKUPY!
@@ -738,6 +963,9 @@ function showReceipt(transaction) {
 function closeReceipt() {
     document.getElementById("receiptWindow").style.display = "none";
 }
+
+
+// NAWIGACJA
 
 function showPage(page) {
     if (page === "manager" && currentRole !== "kierownik") {
@@ -766,6 +994,9 @@ function showPage(page) {
     if (page === "history") renderHistory();
     if (page === "manager") renderManager();
 }
+
+
+// HISTORIA
 
 function renderHistory() {
     const container = document.getElementById("historyList");
@@ -832,6 +1063,9 @@ function renderHistory() {
     });
 }
 
+
+// PANEL KIEROWNIKA - STATYSTYKI
+
 function renderManager() {
     const total = history.reduce(
         (sum, transaction) => sum + Number(transaction.total || 0), 0
@@ -890,15 +1124,203 @@ function renderManager() {
     if (sorted.length === 0) {
         container.innerHTML =
             '<p class="empty">Brak sprzedanych produktów.</p>';
+    } else {
+        sorted.forEach(([name, count]) => {
+            const line = document.createElement("p");
+            line.textContent = name + " – " + count + " szt.";
+            container.appendChild(line);
+        });
+    }
+
+    renderManagerProducts();
+}
+
+
+// ZARZĄDZANIE PRODUKTAMI
+
+function saveProduct() {
+    if (currentRole !== "kierownik") return;
+
+    const name = document.getElementById("productName").value.trim();
+    const priceValue = document.getElementById("productPrice").value;
+    const barcode = document.getElementById("productBarcode").value.trim();
+    const emoji = document.getElementById("productEmoji").value.trim() || "🛒";
+
+    const price = Number(priceValue);
+
+    if (!name || !priceValue || !barcode) {
+        document.getElementById("productMessage").textContent =
+            "Uzupełnij nazwę, cenę i kod kreskowy!";
         return;
     }
 
-    sorted.forEach(([name, count]) => {
-        const line = document.createElement("p");
-        line.textContent = name + " – " + count + " szt.";
-        container.appendChild(line);
+    if (!Number.isFinite(price) || price < 0) {
+        document.getElementById("productMessage").textContent =
+            "Podaj prawidłową cenę!";
+        return;
+    }
+
+    const duplicate = products.findIndex((product, index) =>
+        product.barcode === barcode && index !== editingProductIndex
+    );
+
+    if (duplicate !== -1) {
+        document.getElementById("productMessage").textContent =
+            "Ten kod kreskowy jest już przypisany do innego produktu!";
+        return;
+    }
+
+    const newProduct = {
+        name: name,
+        price: Math.round(price * 100) / 100,
+        barcode: barcode,
+        emoji: emoji
+    };
+
+    if (editingProductIndex === -1) {
+        products.push(newProduct);
+        document.getElementById("productMessage").textContent =
+            "Produkt został dodany!";
+    } else {
+        products[editingProductIndex] = newProduct;
+        document.getElementById("productMessage").textContent =
+            "Produkt został zaktualizowany!";
+    }
+
+    if (!saveProducts()) {
+        products = loadProducts();
+        renderProducts();
+        renderManagerProducts();
+        return;
+    }
+
+    renderProducts();
+    renderManagerProducts();
+    cancelProductEdit();
+}
+
+function renderManagerProducts() {
+    const container = document.getElementById("managerProductList");
+    container.innerHTML = "";
+
+    document.getElementById("productCount").textContent = products.length;
+
+    if (products.length === 0) {
+        container.innerHTML =
+            '<p class="empty">Nie ma jeszcze żadnych produktów.</p>';
+        return;
+    }
+
+    products.forEach((product, index) => {
+        const item = document.createElement("div");
+        item.className = "product-manager-item";
+
+        const info = document.createElement("div");
+        info.className = "product-manager-info";
+
+        const name = document.createElement("strong");
+        name.textContent = product.emoji + " " + product.name;
+
+        const price = document.createElement("p");
+        price.textContent = "Cena: " + money(product.price) + " zł";
+
+        const barcode = document.createElement("p");
+        barcode.textContent = "Kod: " + product.barcode;
+
+        info.appendChild(name);
+        info.appendChild(price);
+        info.appendChild(barcode);
+
+        const actions = document.createElement("div");
+        actions.className = "product-manager-actions";
+
+        const editButton = document.createElement("button");
+        editButton.className = "edit-button";
+        editButton.textContent = "EDYTUJ";
+        editButton.onclick = () => editProduct(index);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "USUŃ";
+        deleteButton.onclick = () => deleteProduct(index);
+
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+
+        item.appendChild(info);
+        item.appendChild(actions);
+
+        container.appendChild(item);
     });
 }
+
+function editProduct(index) {
+    if (currentRole !== "kierownik") return;
+
+    const product = products[index];
+    if (!product) return;
+
+    editingProductIndex = index;
+
+    document.getElementById("productName").value = product.name;
+    document.getElementById("productPrice").value = product.price;
+    document.getElementById("productBarcode").value = product.barcode;
+    document.getElementById("productEmoji").value = product.emoji;
+
+    document.getElementById("productFormTitle").textContent =
+        "Edytuj produkt";
+
+    document.getElementById("cancelEditButton").classList.remove("hidden");
+
+    document.getElementById("productMessage").textContent =
+        "Edytujesz: " + product.name;
+
+    document.getElementById("productName").focus();
+}
+
+function deleteProduct(index) {
+    if (currentRole !== "kierownik") return;
+
+    const product = products[index];
+    if (!product) return;
+
+    if (!confirm("Czy na pewno chcesz usunąć produkt: " + product.name + "?")) {
+        return;
+    }
+
+    products.splice(index, 1);
+
+    if (!saveProducts()) {
+        products = loadProducts();
+    }
+
+    if (editingProductIndex === index) {
+        cancelProductEdit();
+    } else if (editingProductIndex > index) {
+        editingProductIndex--;
+    }
+
+    renderProducts();
+    renderManagerProducts();
+
+    document.getElementById("productMessage").textContent =
+        "Produkt został usunięty.";
+}
+
+function cancelProductEdit() {
+    editingProductIndex = -1;
+
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productBarcode").value = "";
+    document.getElementById("productEmoji").value = "";
+
+    document.getElementById("productFormTitle").textContent =
+        "Dodaj nowy produkt";
+
+    document.getElementById("cancelEditButton").classList.add("hidden");
+}
+
 </script>
 
 </body>
