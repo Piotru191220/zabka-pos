@@ -46,7 +46,7 @@ button {
 
 button:hover { opacity: 0.85; }
 
-input {
+input, select {
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 7px;
@@ -132,6 +132,25 @@ main { padding: 20px; }
 .product strong {
     display: block;
     margin: 5px 0;
+}
+
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.category-button {
+    background: #e8eee9;
+    color: #333;
+    border: 1px solid #ccd5ce;
+}
+
+.category-button.active {
+    background: #008b45;
+    color: white;
+    border-color: #008b45;
 }
 
 .scanner {
@@ -305,9 +324,7 @@ main { padding: 20px; }
     grid-column: 1 / -1;
 }
 
-.secondary {
-    background: #555;
-}
+.secondary { background: #555; }
 
 .product-manager-item {
     display: flex;
@@ -344,6 +361,16 @@ main { padding: 20px; }
 #productMessage {
     font-weight: bold;
     color: #008b45;
+}
+
+.category-label {
+    display: inline-block;
+    background: #e5f3e9;
+    color: #08783e;
+    border-radius: 5px;
+    padding: 4px 7px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 
 @media(max-width: 800px) {
@@ -386,12 +413,9 @@ main { padding: 20px; }
 
 <section id="login">
     <h2>Logowanie</h2>
-
     <input id="username" placeholder="Login">
     <input id="password" type="password" placeholder="Hasło">
-
     <button onclick="login()">ZALOGUJ SIĘ</button>
-
     <p id="loginMessage"></p>
 
     <div class="demo-info">
@@ -408,17 +432,9 @@ main { padding: 20px; }
 <main id="app" class="hidden">
 
     <div class="nav">
-        <button id="posTab" class="active" onclick="showPage('pos')">
-            KASA
-        </button>
-
-        <button id="historyTab" onclick="showPage('history')">
-            HISTORIA SPRZEDAŻY
-        </button>
-
-        <button id="managerTab" class="hidden" onclick="showPage('manager')">
-            PANEL KIEROWNIKA
-        </button>
+        <button id="posTab" class="active" onclick="showPage('pos')">KASA</button>
+        <button id="historyTab" onclick="showPage('history')">HISTORIA SPRZEDAŻY</button>
+        <button id="managerTab" class="hidden" onclick="showPage('manager')">PANEL KIEROWNIKA</button>
     </div>
 
     <section id="posPage">
@@ -428,20 +444,20 @@ main { padding: 20px; }
                 <h2>Produkty</h2>
 
                 <div class="scanner">
-                    <input
-                        id="barcode"
-                        placeholder="Zeskanuj kod kreskowy..."
-                        onkeydown="if(event.key === 'Enter') scanProduct()"
-                    >
+                    <input id="barcode"
+                           placeholder="Zeskanuj kod kreskowy..."
+                           onkeydown="if(event.key === 'Enter') scanProduct()">
                     <button onclick="scanProduct()">SKANUJ</button>
                 </div>
+
+                <h3>Kategorie produktów</h3>
+                <div id="categoryFilters" class="category-filters"></div>
 
                 <div class="products" id="products"></div>
             </div>
 
             <div class="panel">
                 <h2>Koszyk</h2>
-
                 <div id="cart"></div>
 
                 <div class="total">
@@ -453,42 +469,27 @@ main { padding: 20px; }
                     <button onclick="pay('Karta')">KARTA</button>
                 </div>
 
-                <button class="cancel" onclick="clearCart()">
-                    ANULUJ SPRZEDAŻ
-                </button>
-
+                <button class="cancel" onclick="clearCart()">ANULUJ SPRZEDAŻ</button>
                 <p id="message"></p>
 
                 <div id="receiptWindow">
                     <div id="receiptContent"></div>
-
                     <div class="receipt-actions">
                         <button onclick="window.print()">DRUKUJ PARAGON</button>
-                        <button class="receipt-close" onclick="closeReceipt()">
-                            ZAMKNIJ
-                        </button>
+                        <button class="receipt-close" onclick="closeReceipt()">ZAMKNIJ</button>
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 
     <section id="historyPage" class="hidden">
         <div class="panel">
             <h2>Historia sprzedaży</h2>
-
-            <p>
-                Liczba transakcji:
-                <strong id="historyCount">0</strong>
-            </p>
-
-            <p>
-                Łączna wartość sprzedaży:
-                <strong id="historyTotal">0,00 zł</strong>
-            </p>
-
+            <p>Liczba transakcji: <strong id="historyCount">0</strong></p>
+            <p>Łączna wartość sprzedaży: <strong id="historyTotal">0,00 zł</strong></p>
             <hr>
-
             <div id="historyList"></div>
         </div>
     </section>
@@ -496,7 +497,6 @@ main { padding: 20px; }
     <section id="managerPage" class="hidden">
 
         <div class="panel">
-
             <div class="manager-heading">
                 <h2>Panel kierownika</h2>
                 <span class="manager-label">TRYB KIEROWNIKA</span>
@@ -505,49 +505,36 @@ main { padding: 20px; }
             <p>Podsumowanie wszystkich zapisanych transakcji.</p>
 
             <div class="stats-grid">
-
                 <div class="stat-card">
                     <span>Liczba transakcji</span>
                     <strong id="managerCount">0</strong>
                 </div>
-
                 <div class="stat-card">
                     <span>Łączny utarg</span>
                     <strong id="managerTotal">0,00 zł</strong>
                 </div>
-
                 <div class="stat-card">
                     <span>Sprzedane produkty</span>
                     <strong id="managerProducts">0</strong>
                 </div>
-
                 <div class="stat-card">
                     <span>Średnia wartość transakcji</span>
                     <strong id="managerAverage">0,00 zł</strong>
                 </div>
-
             </div>
 
             <hr>
-
             <h3>Podsumowanie płatności</h3>
-
             <p>Gotówka: <strong id="managerCash">0,00 zł</strong></p>
             <p>Karta: <strong id="managerCard">0,00 zł</strong></p>
 
             <hr>
-
             <h3>Najczęściej sprzedawane produkty</h3>
             <div id="managerTopProducts"></div>
-
         </div>
 
-        <!-- ZARZĄDZANIE PRODUKTAMI -->
-
         <div class="panel">
-
             <h2>Zarządzanie produktami</h2>
-
             <p>Dodawaj, edytuj i usuwaj produkty dostępne na kasie.</p>
 
             <h3 id="productFormTitle">Dodaj nowy produkt</h3>
@@ -561,13 +548,7 @@ main { padding: 20px; }
 
                 <div class="form-field">
                     <label for="productPrice">Cena (zł)</label>
-                    <input
-                        id="productPrice"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="Np. 3.99"
-                    >
+                    <input id="productPrice" type="number" min="0" step="0.01" placeholder="Np. 3.99">
                 </div>
 
                 <div class="form-field">
@@ -580,52 +561,86 @@ main { padding: 20px; }
                     <input id="productEmoji" placeholder="Np. 🥤">
                 </div>
 
+                <div class="form-field">
+                    <label for="productCategory">Kategoria produktu</label>
+                    <select id="productCategory">
+                        <option value="Napoje">🥤 Napoje</option>
+                        <option value="Jedzenie">🌭 Jedzenie</option>
+                        <option value="Przekąski">🍟 Przekąski</option>
+                        <option value="Słodycze">🍫 Słodycze</option>
+                        <option value="Pozostałe">📦 Pozostałe</option>
+                    </select>
+                </div>
+
                 <div class="form-buttons">
                     <button onclick="saveProduct()">ZAPISZ PRODUKT</button>
-                    <button
-                        id="cancelEditButton"
-                        class="secondary hidden"
-                        onclick="cancelProductEdit()"
-                    >
+                    <button id="cancelEditButton" class="secondary hidden" onclick="cancelProductEdit()">
                         ANULUJ EDYCJĘ
                     </button>
                 </div>
-
             </div>
 
             <p id="productMessage"></p>
-
             <hr>
 
             <h3>Lista produktów</h3>
-
-            <p>
-                Liczba produktów:
-                <strong id="productCount">0</strong>
-            </p>
-
+            <p>Liczba produktów: <strong id="productCount">0</strong></p>
             <div id="managerProductList"></div>
-
         </div>
 
     </section>
-
 </main>
 
 <script>
 
+// KATEGORIE
+
+const categories = [
+    "Wszystkie",
+    "Napoje",
+    "Jedzenie",
+    "Przekąski",
+    "Słodycze",
+    "Pozostałe"
+];
+
+let activeCategory = "Wszystkie";
+
+function guessCategory(name) {
+    const value = name.toLowerCase();
+
+    if (["woda", "cola", "kawa", "sok", "napój", "herbata"].some(x => value.includes(x))) {
+        return "Napoje";
+    }
+
+    if (["hot dog", "kanapka", "drożdżówka", "bułka", "pizza", "zapiekanka"].some(x => value.includes(x))) {
+        return "Jedzenie";
+    }
+
+    if (["chipsy", "paluszki", "orzeszki", "krakersy"].some(x => value.includes(x))) {
+        return "Przekąski";
+    }
+
+    if (["czekolada", "cukierki", "baton", "żelki", "ciastka"].some(x => value.includes(x))) {
+        return "Słodycze";
+    }
+
+    return "Pozostałe";
+}
+
+
 // DOMYŚLNE PRODUKTY
 
 const defaultProducts = [
-    {name: "Woda", price: 2.99, barcode: "590001", emoji: "💧"},
-    {name: "Cola", price: 5.99, barcode: "590002", emoji: "🥤"},
-    {name: "Kawa", price: 7.99, barcode: "590003", emoji: "☕"},
-    {name: "Hot Dog", price: 8.99, barcode: "590004", emoji: "🌭"},
-    {name: "Chipsy", price: 6.49, barcode: "590005", emoji: "🍟"},
-    {name: "Kanapka", price: 9.99, barcode: "590006", emoji: "🥪"},
-    {name: "Czekolada", price: 4.99, barcode: "590007", emoji: "🍫"},
-    {name: "Sok", price: 4.49, barcode: "590008", emoji: "🧃"},
-    {name: "Drożdżówka", price: 5.49, barcode: "590009", emoji: "🥐"}
+    {name: "Woda", price: 2.99, barcode: "590001", emoji: "💧", category: "Napoje"},
+    {name: "Cola", price: 5.99, barcode: "590002", emoji: "🥤", category: "Napoje"},
+    {name: "Kawa", price: 7.99, barcode: "590003", emoji: "☕", category: "Napoje"},
+    {name: "Hot Dog", price: 8.99, barcode: "590004", emoji: "🌭", category: "Jedzenie"},
+    {name: "Chipsy", price: 6.49, barcode: "590005", emoji: "🍟", category: "Przekąski"},
+    {name: "Kanapka", price: 9.99, barcode: "590006", emoji: "🥪", category: "Jedzenie"},
+    {name: "Czekolada", price: 4.99, barcode: "590007", emoji: "🍫", category: "Słodycze"},
+    {name: "Sok", price: 4.49, barcode: "590008", emoji: "🧃", category: "Napoje"},
+    {name: "Drożdżówka", price: 5.49, barcode: "590009", emoji: "🥐", category: "Jedzenie"}
 ];
 
 let products = loadProducts();
@@ -638,9 +653,7 @@ let editingProductIndex = -1;
 
 function loadProducts() {
     try {
-        const saved = JSON.parse(
-            localStorage.getItem("posProducts") || "null"
-        );
+        const saved = JSON.parse(localStorage.getItem("posProducts") || "null");
 
         if (!Array.isArray(saved)) {
             return defaultProducts.map(p => ({...p}));
@@ -655,7 +668,10 @@ function loadProducts() {
             name: p.name,
             price: Number(p.price),
             barcode: p.barcode,
-            emoji: typeof p.emoji === "string" ? p.emoji : "🛒"
+            emoji: typeof p.emoji === "string" ? p.emoji : "🛒",
+            category: categories.includes(p.category) && p.category !== "Wszystkie"
+                ? p.category
+                : guessCategory(p.name)
         }));
 
     } catch (error) {
@@ -678,10 +694,7 @@ function saveProducts() {
 
 function loadHistory() {
     try {
-        const saved = JSON.parse(
-            localStorage.getItem("posHistory") || "[]"
-        );
-
+        const saved = JSON.parse(localStorage.getItem("posHistory") || "[]");
         return Array.isArray(saved) ? saved : [];
     } catch (error) {
         return [];
@@ -748,6 +761,7 @@ function login() {
     );
 
     showPage("pos");
+    renderCategoryFilters();
     renderProducts();
     renderCart();
 }
@@ -773,13 +787,52 @@ function logout() {
 }
 
 
+// KATEGORIE NA KASIE
+
+function renderCategoryFilters() {
+    const container = document.getElementById("categoryFilters");
+    container.innerHTML = "";
+
+    categories.forEach(category => {
+        const button = document.createElement("button");
+        button.className = "category-button";
+
+        if (activeCategory === category) {
+            button.classList.add("active");
+        }
+
+        const labels = {
+            "Wszystkie": "📋 Wszystkie",
+            "Napoje": "🥤 Napoje",
+            "Jedzenie": "🌭 Jedzenie",
+            "Przekąski": "🍟 Przekąski",
+            "Słodycze": "🍫 Słodycze",
+            "Pozostałe": "📦 Pozostałe"
+        };
+
+        button.textContent = labels[category];
+        button.onclick = () => {
+            activeCategory = category;
+            renderCategoryFilters();
+            renderProducts();
+        };
+
+        container.appendChild(button);
+    });
+}
+
+
 // KASA I PRODUKTY
 
 function renderProducts() {
     const container = document.getElementById("products");
     container.innerHTML = "";
 
-    products.forEach(product => {
+    const filteredProducts = activeCategory === "Wszystkie"
+        ? products
+        : products.filter(p => p.category === activeCategory);
+
+    filteredProducts.forEach(product => {
         const button = document.createElement("button");
         button.className = "product";
 
@@ -797,13 +850,12 @@ function renderProducts() {
         button.appendChild(price);
 
         button.onclick = () => addProduct(product);
-
         container.appendChild(button);
     });
 
-    if (products.length === 0) {
+    if (filteredProducts.length === 0) {
         container.innerHTML =
-            '<p class="empty">Brak produktów. Dodaj je w panelu kierownika.</p>';
+            '<p class="empty">Brak produktów w tej kategorii.</p>';
     }
 }
 
@@ -908,7 +960,6 @@ function pay(method) {
     }
 
     showReceipt(transaction);
-
     receiptNumber++;
 
     cart = [];
@@ -948,9 +999,7 @@ function showReceipt(transaction) {
         </div>
         <p>Płatność: ${escapeHtml(transaction.method)}</p>
         <hr>
-        <p style="text-align:center">
-            DZIĘKUJEMY ZA ZAKUPY!
-        </p>
+        <p style="text-align:center">DZIĘKUJEMY ZA ZAKUPY!</p>
         <p style="text-align:center;font-size:12px">
             To nie jest dokument fiskalny.
         </p>
@@ -979,17 +1028,9 @@ function showPage(page) {
             .classList.toggle("hidden", name !== page);
     });
 
-    document.getElementById("posTab").classList.toggle(
-        "active", page === "pos"
-    );
-
-    document.getElementById("historyTab").classList.toggle(
-        "active", page === "history"
-    );
-
-    document.getElementById("managerTab").classList.toggle(
-        "active", page === "manager"
-    );
+    document.getElementById("posTab").classList.toggle("active", page === "pos");
+    document.getElementById("historyTab").classList.toggle("active", page === "history");
+    document.getElementById("managerTab").classList.toggle("active", page === "manager");
 
     if (page === "history") renderHistory();
     if (page === "manager") renderManager();
@@ -1030,8 +1071,7 @@ function renderHistory() {
             " | " + transaction.method;
 
         const amount = document.createElement("p");
-        amount.textContent =
-            "Kwota: " + money(transaction.total) + " zł";
+        amount.textContent = "Kwota: " + money(transaction.total) + " zł";
 
         const detailsButton = document.createElement("button");
         detailsButton.textContent = "SZCZEGÓŁY";
@@ -1085,27 +1125,14 @@ function renderManager() {
         .filter(t => t.method === "Karta")
         .reduce((sum, t) => sum + Number(t.total || 0), 0);
 
-    const average = history.length > 0
-        ? total / history.length
-        : 0;
+    const average = history.length > 0 ? total / history.length : 0;
 
-    document.getElementById("managerCount").textContent =
-        history.length;
-
-    document.getElementById("managerTotal").textContent =
-        money(total) + " zł";
-
-    document.getElementById("managerProducts").textContent =
-        productCount;
-
-    document.getElementById("managerAverage").textContent =
-        money(average) + " zł";
-
-    document.getElementById("managerCash").textContent =
-        money(cash) + " zł";
-
-    document.getElementById("managerCard").textContent =
-        money(card) + " zł";
+    document.getElementById("managerCount").textContent = history.length;
+    document.getElementById("managerTotal").textContent = money(total) + " zł";
+    document.getElementById("managerProducts").textContent = productCount;
+    document.getElementById("managerAverage").textContent = money(average) + " zł";
+    document.getElementById("managerCash").textContent = money(cash) + " zł";
+    document.getElementById("managerCard").textContent = money(card) + " zł";
 
     const counts = {};
 
@@ -1115,15 +1142,13 @@ function renderManager() {
         });
     });
 
-    const sorted = Object.entries(counts)
-        .sort((a, b) => b[1] - a[1]);
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
 
     const container = document.getElementById("managerTopProducts");
     container.innerHTML = "";
 
     if (sorted.length === 0) {
-        container.innerHTML =
-            '<p class="empty">Brak sprzedanych produktów.</p>';
+        container.innerHTML = '<p class="empty">Brak sprzedanych produktów.</p>';
     } else {
         sorted.forEach(([name, count]) => {
             const line = document.createElement("p");
@@ -1145,6 +1170,7 @@ function saveProduct() {
     const priceValue = document.getElementById("productPrice").value;
     const barcode = document.getElementById("productBarcode").value.trim();
     const emoji = document.getElementById("productEmoji").value.trim() || "🛒";
+    const category = document.getElementById("productCategory").value;
 
     const price = Number(priceValue);
 
@@ -1174,7 +1200,8 @@ function saveProduct() {
         name: name,
         price: Math.round(price * 100) / 100,
         barcode: barcode,
-        emoji: emoji
+        emoji: emoji,
+        category: category
     };
 
     if (editingProductIndex === -1) {
@@ -1206,8 +1233,7 @@ function renderManagerProducts() {
     document.getElementById("productCount").textContent = products.length;
 
     if (products.length === 0) {
-        container.innerHTML =
-            '<p class="empty">Nie ma jeszcze żadnych produktów.</p>';
+        container.innerHTML = '<p class="empty">Nie ma jeszcze żadnych produktów.</p>';
         return;
     }
 
@@ -1227,9 +1253,14 @@ function renderManagerProducts() {
         const barcode = document.createElement("p");
         barcode.textContent = "Kod: " + product.barcode;
 
+        const category = document.createElement("span");
+        category.className = "category-label";
+        category.textContent = product.category;
+
         info.appendChild(name);
         info.appendChild(price);
         info.appendChild(barcode);
+        info.appendChild(category);
 
         const actions = document.createElement("div");
         actions.className = "product-manager-actions";
@@ -1249,7 +1280,6 @@ function renderManagerProducts() {
 
         item.appendChild(info);
         item.appendChild(actions);
-
         container.appendChild(item);
     });
 }
@@ -1266,12 +1296,10 @@ function editProduct(index) {
     document.getElementById("productPrice").value = product.price;
     document.getElementById("productBarcode").value = product.barcode;
     document.getElementById("productEmoji").value = product.emoji;
+    document.getElementById("productCategory").value = product.category;
 
-    document.getElementById("productFormTitle").textContent =
-        "Edytuj produkt";
-
+    document.getElementById("productFormTitle").textContent = "Edytuj produkt";
     document.getElementById("cancelEditButton").classList.remove("hidden");
-
     document.getElementById("productMessage").textContent =
         "Edytujesz: " + product.name;
 
@@ -1314,6 +1342,7 @@ function cancelProductEdit() {
     document.getElementById("productPrice").value = "";
     document.getElementById("productBarcode").value = "";
     document.getElementById("productEmoji").value = "";
+    document.getElementById("productCategory").value = "Napoje";
 
     document.getElementById("productFormTitle").textContent =
         "Dodaj nowy produkt";
