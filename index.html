@@ -5,1352 +5,595 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Symulator POS</title>
-
 <style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f1f4f6;
-    color: #222;
-}
-
-header {
-    background: #008b45;
-    color: white;
-    padding: 17px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-header h1 { margin: 0; }
-
-header button {
-    background: white;
-    color: #008b45;
-}
-
-button {
-    border: none;
-    border-radius: 7px;
-    padding: 11px 15px;
-    cursor: pointer;
-    font-weight: bold;
-    background: #008b45;
-    color: white;
-}
-
-button:hover { opacity: 0.85; }
-
-input, select {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 7px;
-    font-size: 16px;
-    width: 100%;
-}
-
-.hidden { display: none !important; }
-
-#login {
-    max-width: 360px;
-    margin: 90px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 3px 15px #0002;
-}
-
-#login input {
-    width: 100%;
-    margin: 8px 0;
-}
-
-#login button {
-    width: 100%;
-    margin-top: 10px;
-}
-
-.demo-info {
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-    margin-top: 15px;
-    line-height: 1.7;
-}
-
-main { padding: 20px; }
-
-.nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.nav button { background: #555; }
-.nav button.active { background: #008b45; }
-
-.layout {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 20px;
-}
-
-.panel {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px #0001;
-    margin-bottom: 20px;
-}
-
-.products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-    gap: 12px;
-}
-
-.product {
-    background: #f5f7f5;
-    color: #222;
-    border: 1px solid #ddd;
-    padding: 15px 8px;
-    min-height: 125px;
-}
-
-.product span {
-    display: block;
-    font-size: 30px;
-    margin-bottom: 8px;
-}
-
-.product strong {
-    display: block;
-    margin: 5px 0;
-}
-
-.category-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 15px 0;
-}
-
-.category-button {
-    background: #e8eee9;
-    color: #333;
-    border: 1px solid #ccd5ce;
-}
-
-.category-button.active {
-    background: #008b45;
-    color: white;
-    border-color: #008b45;
-}
-
-.scanner {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.scanner input {
-    flex: 1;
-    min-width: 0;
-}
-
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-}
-
-.remove {
-    background: #d93636;
-    padding: 6px 10px;
-}
-
-.total {
-    font-size: 23px;
-    font-weight: bold;
-    margin: 20px 0;
-}
-
-.pay-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.pay-buttons button { flex: 1; }
-
-.cancel {
-    background: #d93636;
-    width: 100%;
-    margin-top: 10px;
-}
-
-#message {
-    color: #008b45;
-    font-weight: bold;
-}
-
-#receiptWindow {
-    display: none;
-    background: white;
-    border: 1px dashed #777;
-    padding: 20px;
-    margin-top: 20px;
-    font-family: monospace;
-}
-
-.receipt-title {
-    text-align: center;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-.receipt-line {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 8px 0;
-}
-
-.receipt-total {
-    font-size: 18px;
-    font-weight: bold;
-    border-top: 1px dashed black;
-    padding-top: 10px;
-}
-
-.receipt-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.receipt-close { background: #555; }
-
-.history-item {
-    background: #f5f7f5;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
-}
-
-.history-item button { margin-top: 10px; }
-
-.history-details {
-    margin-top: 10px;
-    padding: 10px;
-    background: white;
-    border-radius: 7px;
-}
-
-.empty {
-    color: #777;
-    text-align: center;
-    padding: 30px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.stat-card {
-    background: #f5f7f5;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-}
-
-.stat-card span {
-    display: block;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.stat-card strong {
-    font-size: 25px;
-    color: #008b45;
-}
-
-.manager-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.manager-label {
-    color: #008b45;
-    font-weight: bold;
-}
-
-.product-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 15px;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.form-field label {
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.form-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    grid-column: 1 / -1;
-}
-
-.secondary { background: #555; }
-
-.product-manager-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 13px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-top: 10px;
-    background: #f8faf8;
-}
-
-.product-manager-info {
-    min-width: 150px;
-    flex: 1;
-}
-
-.product-manager-info p {
-    margin: 5px 0;
-    color: #666;
-    font-size: 13px;
-}
-
-.product-manager-actions {
-    display: flex;
-    gap: 7px;
-}
-
-.edit-button { background: #2878bd; }
-.delete-button { background: #d93636; }
-
-#productMessage {
-    font-weight: bold;
-    color: #008b45;
-}
-
-.category-label {
-    display: inline-block;
-    background: #e5f3e9;
-    color: #08783e;
-    border-radius: 5px;
-    padding: 4px 7px;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-@media(max-width: 800px) {
-    .layout { grid-template-columns: 1fr; }
-}
-
-@media(max-width: 500px) {
-    .product-form { grid-template-columns: 1fr; }
-    .form-buttons { grid-column: 1; }
-}
-
-@media print {
-    body * { visibility: hidden; }
-
-    #receiptWindow,
-    #receiptWindow * {
-        visibility: visible;
-    }
-
-    #receiptWindow {
-        display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        border: none;
-    }
-
-    .receipt-actions { display: none !important; }
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f4f6;color:#222}
+header{background:#008b45;color:white;padding:17px 25px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+header h1{margin:0}
+header button{background:white;color:#008b45}
+button{border:none;border-radius:7px;padding:11px 15px;cursor:pointer;font-weight:bold;background:#008b45;color:white}
+button:hover{opacity:.85}
+input,select{padding:12px;border:1px solid #ccc;border-radius:7px;font-size:16px;width:100%}
+.hidden{display:none!important}
+#login{max-width:360px;margin:90px auto;background:white;padding:25px;border-radius:12px;box-shadow:0 3px 15px #0002}
+#login input{margin:8px 0}
+#login button{width:100%;margin-top:10px}
+.demo-info{font-size:12px;color:#666;text-align:center;margin-top:15px;line-height:1.7}
+main{padding:20px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.nav button{background:#555}
+.nav button.active{background:#008b45}
+.layout{display:grid;grid-template-columns:1fr 350px;gap:20px}
+.panel{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 10px #0001;margin-bottom:20px}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}
+.product{background:#f5f7f5;color:#222;border:1px solid #ddd;padding:15px 8px;min-height:145px}
+.product span{display:block;font-size:30px;margin-bottom:8px}
+.product strong{display:block;margin:5px 0}
+.stock-label{display:block;font-size:12px;margin-top:7px;color:#2878bd}
+.stock-low{color:#c77700;font-weight:bold}
+.stock-empty{color:#d93636;font-weight:bold}
+.product:disabled{opacity:.5;cursor:not-allowed}
+.category-filters{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
+.category-button{background:#e8eee9;color:#333;border:1px solid #ccd5ce}
+.category-button.active{background:#008b45;color:white;border-color:#008b45}
+.scanner{display:flex;gap:8px;margin-bottom:20px}
+.scanner input{flex:1;min-width:0}
+.cart-item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #ddd;padding:10px 0}
+.remove{background:#d93636;padding:6px 10px}
+.total{font-size:23px;font-weight:bold;margin:20px 0}
+.pay-buttons{display:flex;gap:8px}
+.pay-buttons button{flex:1}
+.cancel{background:#d93636;width:100%;margin-top:10px}
+#message{color:#008b45;font-weight:bold}
+#receiptWindow{display:none;background:white;border:1px dashed #777;padding:20px;margin-top:20px;font-family:monospace}
+.receipt-title{text-align:center;font-weight:bold;font-size:20px}
+.receipt-line{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
+.receipt-total{font-size:18px;font-weight:bold;border-top:1px dashed black;padding-top:10px}
+.receipt-actions{display:flex;gap:8px;margin-top:15px}
+.receipt-close{background:#555}
+.history-item{background:#f5f7f5;padding:15px;border-radius:8px;margin-bottom:12px;border:1px solid #ddd}
+.history-item button{margin-top:10px}
+.history-details{margin-top:10px;padding:10px;background:white;border-radius:7px}
+.empty{color:#777;text-align:center;padding:30px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-top:20px}
+.stat-card{background:#f5f7f5;border:1px solid #ddd;border-radius:10px;padding:20px}
+.stat-card span{display:block;color:#666;margin-bottom:10px}
+.stat-card strong{font-size:25px;color:#008b45}
+.manager-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.manager-label{color:#008b45;font-weight:bold}
+.product-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.form-field label{font-weight:bold;font-size:14px}
+.form-buttons{display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1}
+.secondary{background:#555}
+.product-manager-item{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:13px;border:1px solid #ddd;border-radius:8px;margin-top:10px;background:#f8faf8}
+.product-manager-info{min-width:150px;flex:1}
+.product-manager-info p{margin:5px 0;color:#666;font-size:13px}
+.product-manager-actions{display:flex;gap:7px;flex-wrap:wrap}
+.edit-button{background:#2878bd}
+.delete-button{background:#d93636}
+.stock-button{background:#008b45}
+#productMessage{font-weight:bold;color:#008b45}
+.category-label{display:inline-block;background:#e5f3e9;color:#08783e;border-radius:5px;padding:4px 7px;font-size:12px;margin-top:5px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+@media(max-width:500px){.product-form{grid-template-columns:1fr}.form-buttons{grid-column:1}}
+@media print{
+body *{visibility:hidden}
+#receiptWindow,#receiptWindow *{visibility:visible}
+#receiptWindow{display:block!important;position:absolute;left:0;top:0;width:100%;border:none}
+.receipt-actions{display:none!important}
 }
 </style>
 </head>
-
 <body>
 
 <header>
-    <h1>ŻABKA | SYMULATOR POS</h1>
-    <button id="logoutButton" class="hidden" onclick="logout()">WYLOGUJ</button>
+<h1>ŻABKA | SYMULATOR POS</h1>
+<button id="logoutButton" class="hidden" onclick="logout()">WYLOGUJ</button>
 </header>
 
 <section id="login">
-    <h2>Logowanie</h2>
-    <input id="username" placeholder="Login">
-    <input id="password" type="password" placeholder="Hasło">
-    <button onclick="login()">ZALOGUJ SIĘ</button>
-    <p id="loginMessage"></p>
-
-    <div class="demo-info">
-        Wersja demonstracyjna.<br><br>
-        PRACOWNIK<br>
-        Login: pracownik<br>
-        Hasło: 1234<br><br>
-        KIEROWNIK<br>
-        Login: kierownik<br>
-        Hasło: 5678
-    </div>
+<h2>Logowanie</h2>
+<input id="username" placeholder="Login">
+<input id="password" type="password" placeholder="Hasło">
+<button onclick="login()">ZALOGUJ SIĘ</button>
+<p id="loginMessage"></p>
+<div class="demo-info">
+Wersja demonstracyjna.<br><br>
+PRACOWNIK<br>Login: pracownik<br>Hasło: 1234<br><br>
+KIEROWNIK<br>Login: kierownik<br>Hasło: 5678
+</div>
 </section>
 
 <main id="app" class="hidden">
+<div class="nav">
+<button id="posTab" class="active" onclick="showPage('pos')">KASA</button>
+<button id="historyTab" onclick="showPage('history')">HISTORIA SPRZEDAŻY</button>
+<button id="managerTab" class="hidden" onclick="showPage('manager')">PANEL KIEROWNIKA</button>
+</div>
 
-    <div class="nav">
-        <button id="posTab" class="active" onclick="showPage('pos')">KASA</button>
-        <button id="historyTab" onclick="showPage('history')">HISTORIA SPRZEDAŻY</button>
-        <button id="managerTab" class="hidden" onclick="showPage('manager')">PANEL KIEROWNIKA</button>
-    </div>
+<section id="posPage">
+<div class="layout">
+<div class="panel">
+<h2>Produkty</h2>
+<div class="scanner">
+<input id="barcode" placeholder="Zeskanuj kod kreskowy..." onkeydown="if(event.key==='Enter')scanProduct()">
+<button onclick="scanProduct()">SKANUJ</button>
+</div>
+<h3>Kategorie produktów</h3>
+<div id="categoryFilters" class="category-filters"></div>
+<div class="products" id="products"></div>
+</div>
 
-    <section id="posPage">
-        <div class="layout">
+<div class="panel">
+<h2>Koszyk</h2>
+<div id="cart"></div>
+<div class="total">SUMA: <span id="total">0,00</span> zł</div>
+<div class="pay-buttons">
+<button onclick="pay('Gotówka')">GOTÓWKA</button>
+<button onclick="pay('Karta')">KARTA</button>
+</div>
+<button class="cancel" onclick="clearCart()">ANULUJ SPRZEDAŻ</button>
+<p id="message"></p>
+<div id="receiptWindow">
+<div id="receiptContent"></div>
+<div class="receipt-actions">
+<button onclick="window.print()">DRUKUJ PARAGON</button>
+<button class="receipt-close" onclick="closeReceipt()">ZAMKNIJ</button>
+</div>
+</div>
+</div>
+</div>
+</section>
 
-            <div class="panel">
-                <h2>Produkty</h2>
+<section id="historyPage" class="hidden">
+<div class="panel">
+<h2>Historia sprzedaży</h2>
+<p>Liczba transakcji: <strong id="historyCount">0</strong></p>
+<p>Łączna wartość sprzedaży: <strong id="historyTotal">0,00 zł</strong></p>
+<hr>
+<div id="historyList"></div>
+</div>
+</section>
 
-                <div class="scanner">
-                    <input id="barcode"
-                           placeholder="Zeskanuj kod kreskowy..."
-                           onkeydown="if(event.key === 'Enter') scanProduct()">
-                    <button onclick="scanProduct()">SKANUJ</button>
-                </div>
+<section id="managerPage" class="hidden">
+<div class="panel">
+<div class="manager-heading">
+<h2>Panel kierownika</h2>
+<span class="manager-label">TRYB KIEROWNIKA</span>
+</div>
+<p>Podsumowanie wszystkich zapisanych transakcji.</p>
+<div class="stats-grid">
+<div class="stat-card"><span>Liczba transakcji</span><strong id="managerCount">0</strong></div>
+<div class="stat-card"><span>Łączny utarg</span><strong id="managerTotal">0,00 zł</strong></div>
+<div class="stat-card"><span>Sprzedane produkty</span><strong id="managerProducts">0</strong></div>
+<div class="stat-card"><span>Średnia wartość transakcji</span><strong id="managerAverage">0,00 zł</strong></div>
+</div>
+<hr>
+<h3>Podsumowanie płatności</h3>
+<p>Gotówka: <strong id="managerCash">0,00 zł</strong></p>
+<p>Karta: <strong id="managerCard">0,00 zł</strong></p>
+<hr>
+<h3>Najczęściej sprzedawane produkty</h3>
+<div id="managerTopProducts"></div>
+</div>
 
-                <h3>Kategorie produktów</h3>
-                <div id="categoryFilters" class="category-filters"></div>
+<div class="panel">
+<h2>📦 Magazyn</h2>
+<p>Stan magazynowy produktów. Zmiany ilości są zapisywane automatycznie.</p>
+<div class="stats-grid">
+<div class="stat-card"><span>Wszystkie sztuki</span><strong id="stockTotal">0</strong></div>
+<div class="stat-card"><span>Produkty z niskim stanem</span><strong id="stockLowCount">0</strong></div>
+<div class="stat-card"><span>Produkty niedostępne</span><strong id="stockEmptyCount">0</strong></div>
+</div>
+<hr>
+<h3>Lista stanów magazynowych</h3>
+<div id="stockManagerList"></div>
+</div>
 
-                <div class="products" id="products"></div>
-            </div>
-
-            <div class="panel">
-                <h2>Koszyk</h2>
-                <div id="cart"></div>
-
-                <div class="total">
-                    SUMA: <span id="total">0,00</span> zł
-                </div>
-
-                <div class="pay-buttons">
-                    <button onclick="pay('Gotówka')">GOTÓWKA</button>
-                    <button onclick="pay('Karta')">KARTA</button>
-                </div>
-
-                <button class="cancel" onclick="clearCart()">ANULUJ SPRZEDAŻ</button>
-                <p id="message"></p>
-
-                <div id="receiptWindow">
-                    <div id="receiptContent"></div>
-                    <div class="receipt-actions">
-                        <button onclick="window.print()">DRUKUJ PARAGON</button>
-                        <button class="receipt-close" onclick="closeReceipt()">ZAMKNIJ</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="historyPage" class="hidden">
-        <div class="panel">
-            <h2>Historia sprzedaży</h2>
-            <p>Liczba transakcji: <strong id="historyCount">0</strong></p>
-            <p>Łączna wartość sprzedaży: <strong id="historyTotal">0,00 zł</strong></p>
-            <hr>
-            <div id="historyList"></div>
-        </div>
-    </section>
-
-    <section id="managerPage" class="hidden">
-
-        <div class="panel">
-            <div class="manager-heading">
-                <h2>Panel kierownika</h2>
-                <span class="manager-label">TRYB KIEROWNIKA</span>
-            </div>
-
-            <p>Podsumowanie wszystkich zapisanych transakcji.</p>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span>Liczba transakcji</span>
-                    <strong id="managerCount">0</strong>
-                </div>
-                <div class="stat-card">
-                    <span>Łączny utarg</span>
-                    <strong id="managerTotal">0,00 zł</strong>
-                </div>
-                <div class="stat-card">
-                    <span>Sprzedane produkty</span>
-                    <strong id="managerProducts">0</strong>
-                </div>
-                <div class="stat-card">
-                    <span>Średnia wartość transakcji</span>
-                    <strong id="managerAverage">0,00 zł</strong>
-                </div>
-            </div>
-
-            <hr>
-            <h3>Podsumowanie płatności</h3>
-            <p>Gotówka: <strong id="managerCash">0,00 zł</strong></p>
-            <p>Karta: <strong id="managerCard">0,00 zł</strong></p>
-
-            <hr>
-            <h3>Najczęściej sprzedawane produkty</h3>
-            <div id="managerTopProducts"></div>
-        </div>
-
-        <div class="panel">
-            <h2>Zarządzanie produktami</h2>
-            <p>Dodawaj, edytuj i usuwaj produkty dostępne na kasie.</p>
-
-            <h3 id="productFormTitle">Dodaj nowy produkt</h3>
-
-            <div class="product-form">
-
-                <div class="form-field">
-                    <label for="productName">Nazwa produktu</label>
-                    <input id="productName" placeholder="Np. Woda">
-                </div>
-
-                <div class="form-field">
-                    <label for="productPrice">Cena (zł)</label>
-                    <input id="productPrice" type="number" min="0" step="0.01" placeholder="Np. 3.99">
-                </div>
-
-                <div class="form-field">
-                    <label for="productBarcode">Kod kreskowy</label>
-                    <input id="productBarcode" placeholder="Np. 590010">
-                </div>
-
-                <div class="form-field">
-                    <label for="productEmoji">Emoji</label>
-                    <input id="productEmoji" placeholder="Np. 🥤">
-                </div>
-
-                <div class="form-field">
-                    <label for="productCategory">Kategoria produktu</label>
-                    <select id="productCategory">
-                        <option value="Napoje">🥤 Napoje</option>
-                        <option value="Jedzenie">🌭 Jedzenie</option>
-                        <option value="Przekąski">🍟 Przekąski</option>
-                        <option value="Słodycze">🍫 Słodycze</option>
-                        <option value="Pozostałe">📦 Pozostałe</option>
-                    </select>
-                </div>
-
-                <div class="form-buttons">
-                    <button onclick="saveProduct()">ZAPISZ PRODUKT</button>
-                    <button id="cancelEditButton" class="secondary hidden" onclick="cancelProductEdit()">
-                        ANULUJ EDYCJĘ
-                    </button>
-                </div>
-            </div>
-
-            <p id="productMessage"></p>
-            <hr>
-
-            <h3>Lista produktów</h3>
-            <p>Liczba produktów: <strong id="productCount">0</strong></p>
-            <div id="managerProductList"></div>
-        </div>
-
-    </section>
+<div class="panel">
+<h2>Zarządzanie produktami</h2>
+<p>Dodawaj, edytuj i usuwaj produkty dostępne na kasie.</p>
+<h3 id="productFormTitle">Dodaj nowy produkt</h3>
+<div class="product-form">
+<div class="form-field"><label for="productName">Nazwa produktu</label><input id="productName" placeholder="Np. Woda"></div>
+<div class="form-field"><label for="productPrice">Cena (zł)</label><input id="productPrice" type="number" min="0" step="0.01" placeholder="Np. 3.99"></div>
+<div class="form-field"><label for="productBarcode">Kod kreskowy</label><input id="productBarcode" placeholder="Np. 590010"></div>
+<div class="form-field"><label for="productEmoji">Emoji</label><input id="productEmoji" placeholder="Np. 🥤"></div>
+<div class="form-field"><label for="productCategory">Kategoria produktu</label>
+<select id="productCategory">
+<option value="Napoje">🥤 Napoje</option>
+<option value="Jedzenie">🌭 Jedzenie</option>
+<option value="Przekąski">🍟 Przekąski</option>
+<option value="Słodycze">🍫 Słodycze</option>
+<option value="Pozostałe">📦 Pozostałe</option>
+</select></div>
+<div class="form-field"><label for="productStock">Ilość w magazynie (szt.)</label><input id="productStock" type="number" min="0" step="1" value="20"></div>
+<div class="form-buttons">
+<button onclick="saveProduct()">ZAPISZ PRODUKT</button>
+<button id="cancelEditButton" class="secondary hidden" onclick="cancelProductEdit()">ANULUJ EDYCJĘ</button>
+</div>
+</div>
+<p id="productMessage"></p>
+<hr>
+<h3>Lista produktów</h3>
+<p>Liczba produktów: <strong id="productCount">0</strong></p>
+<div id="managerProductList"></div>
+</div>
+</section>
 </main>
 
 <script>
+const categories=["Wszystkie","Napoje","Jedzenie","Przekąski","Słodycze","Pozostałe"];
+let activeCategory="Wszystkie";
 
-// KATEGORIE
+function guessCategory(name){
+const value=name.toLowerCase();
+if(["woda","cola","kawa","sok","napój","herbata"].some(x=>value.includes(x)))return "Napoje";
+if(["hot dog","kanapka","drożdżówka","bułka","pizza","zapiekanka"].some(x=>value.includes(x)))return "Jedzenie";
+if(["chipsy","paluszki","orzeszki","krakersy"].some(x=>value.includes(x)))return "Przekąski";
+if(["czekolada","cukierki","baton","żelki","ciastka","lody"].some(x=>value.includes(x)))return "Słodycze";
+return "Pozostałe";
+}
 
-const categories = [
-    "Wszystkie",
-    "Napoje",
-    "Jedzenie",
-    "Przekąski",
-    "Słodycze",
-    "Pozostałe"
+const defaultProducts=[
+{name:"Woda",price:2.99,barcode:"590001",emoji:"💧",category:"Napoje",stock:20},
+{name:"Cola",price:5.99,barcode:"590002",emoji:"🥤",category:"Napoje",stock:20},
+{name:"Kawa",price:7.99,barcode:"590003",emoji:"☕",category:"Napoje",stock:20},
+{name:"Hot Dog",price:8.99,barcode:"590004",emoji:"🌭",category:"Jedzenie",stock:20},
+{name:"Chipsy",price:6.49,barcode:"590005",emoji:"🍟",category:"Przekąski",stock:20},
+{name:"Kanapka",price:9.99,barcode:"590006",emoji:"🥪",category:"Jedzenie",stock:20},
+{name:"Czekolada",price:4.99,barcode:"590007",emoji:"🍫",category:"Słodycze",stock:20},
+{name:"Sok",price:4.49,barcode:"590008",emoji:"🧃",category:"Napoje",stock:20},
+{name:"Drożdżówka",price:5.49,barcode:"590009",emoji:"🥐",category:"Jedzenie",stock:20}
 ];
 
-let activeCategory = "Wszystkie";
-
-function guessCategory(name) {
-    const value = name.toLowerCase();
-
-    if (["woda", "cola", "kawa", "sok", "napój", "herbata"].some(x => value.includes(x))) {
-        return "Napoje";
-    }
-
-    if (["hot dog", "kanapka", "drożdżówka", "bułka", "pizza", "zapiekanka"].some(x => value.includes(x))) {
-        return "Jedzenie";
-    }
-
-    if (["chipsy", "paluszki", "orzeszki", "krakersy"].some(x => value.includes(x))) {
-        return "Przekąski";
-    }
-
-    if (["czekolada", "cukierki", "baton", "żelki", "ciastka"].some(x => value.includes(x))) {
-        return "Słodycze";
-    }
-
-    return "Pozostałe";
+function loadProducts(){
+try{
+const saved=JSON.parse(localStorage.getItem("posProducts")||"null");
+if(!Array.isArray(saved))return defaultProducts.map(p=>({...p}));
+return saved.filter(p=>p&&typeof p.name==="string"&&Number.isFinite(Number(p.price))&&typeof p.barcode==="string").map(p=>({
+name:p.name,price:Number(p.price),barcode:p.barcode,
+emoji:typeof p.emoji==="string"?p.emoji:"🛒",
+category:categories.includes(p.category)&&p.category!=="Wszystkie"?p.category:guessCategory(p.name),
+stock:Number.isInteger(Number(p.stock))&&Number(p.stock)>=0?Number(p.stock):20
+}));
+}catch(e){return defaultProducts.map(p=>({...p}));}
 }
 
+let products=loadProducts();
+let cart=[];
+let currentRole="";
+let editingProductIndex=-1;
 
-// DOMYŚLNE PRODUKTY
-
-const defaultProducts = [
-    {name: "Woda", price: 2.99, barcode: "590001", emoji: "💧", category: "Napoje"},
-    {name: "Cola", price: 5.99, barcode: "590002", emoji: "🥤", category: "Napoje"},
-    {name: "Kawa", price: 7.99, barcode: "590003", emoji: "☕", category: "Napoje"},
-    {name: "Hot Dog", price: 8.99, barcode: "590004", emoji: "🌭", category: "Jedzenie"},
-    {name: "Chipsy", price: 6.49, barcode: "590005", emoji: "🍟", category: "Przekąski"},
-    {name: "Kanapka", price: 9.99, barcode: "590006", emoji: "🥪", category: "Jedzenie"},
-    {name: "Czekolada", price: 4.99, barcode: "590007", emoji: "🍫", category: "Słodycze"},
-    {name: "Sok", price: 4.49, barcode: "590008", emoji: "🧃", category: "Napoje"},
-    {name: "Drożdżówka", price: 5.49, barcode: "590009", emoji: "🥐", category: "Jedzenie"}
-];
-
-let products = loadProducts();
-let cart = [];
-let currentRole = "";
-let editingProductIndex = -1;
-
-
-// PRODUKTY - ZAPIS I ODCZYT
-
-function loadProducts() {
-    try {
-        const saved = JSON.parse(localStorage.getItem("posProducts") || "null");
-
-        if (!Array.isArray(saved)) {
-            return defaultProducts.map(p => ({...p}));
-        }
-
-        return saved.filter(p =>
-            p &&
-            typeof p.name === "string" &&
-            Number.isFinite(Number(p.price)) &&
-            typeof p.barcode === "string"
-        ).map(p => ({
-            name: p.name,
-            price: Number(p.price),
-            barcode: p.barcode,
-            emoji: typeof p.emoji === "string" ? p.emoji : "🛒",
-            category: categories.includes(p.category) && p.category !== "Wszystkie"
-                ? p.category
-                : guessCategory(p.name)
-        }));
-
-    } catch (error) {
-        return defaultProducts.map(p => ({...p}));
-    }
+function saveProducts(){
+try{localStorage.setItem("posProducts",JSON.stringify(products));return true;}
+catch(e){alert("Nie udało się zapisać produktów.");return false;}
 }
 
-function saveProducts() {
-    try {
-        localStorage.setItem("posProducts", JSON.stringify(products));
-        return true;
-    } catch (error) {
-        alert("Nie udało się zapisać listy produktów.");
-        return false;
-    }
+function loadHistory(){
+try{const saved=JSON.parse(localStorage.getItem("posHistory")||"[]");return Array.isArray(saved)?saved:[];}
+catch(e){return [];}
+}
+let history=loadHistory();
+let receiptNumber=history.length?Math.max(...history.map(t=>Number(t.number)||0))+1:1;
+
+function saveHistory(){
+try{localStorage.setItem("posHistory",JSON.stringify(history));return true;}
+catch(e){alert("Nie udało się zapisać historii.");return false;}
+}
+function money(value){return Number(value).toFixed(2).replace(".",",");}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+
+function login(){
+const username=document.getElementById("username").value;
+const password=document.getElementById("password").value;
+if(username==="pracownik"&&password==="1234")currentRole="pracownik";
+else if(username==="kierownik"&&password==="5678")currentRole="kierownik";
+else{document.getElementById("loginMessage").textContent="Nieprawidłowy login lub hasło!";return;}
+document.getElementById("login").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+document.getElementById("logoutButton").classList.remove("hidden");
+document.getElementById("managerTab").classList.toggle("hidden",currentRole!=="kierownik");
+showPage("pos");renderCategoryFilters();renderProducts();renderCart();
+}
+function logout(){
+cart=[];currentRole="";
+document.getElementById("app").classList.add("hidden");
+document.getElementById("login").classList.remove("hidden");
+document.getElementById("logoutButton").classList.add("hidden");
+document.getElementById("username").value="";
+document.getElementById("password").value="";
+document.getElementById("loginMessage").textContent="";
+document.getElementById("barcode").value="";
+document.getElementById("managerTab").classList.add("hidden");
+cancelProductEdit();closeReceipt();renderCart();
 }
 
-
-// HISTORIA SPRZEDAŻY
-
-function loadHistory() {
-    try {
-        const saved = JSON.parse(localStorage.getItem("posHistory") || "[]");
-        return Array.isArray(saved) ? saved : [];
-    } catch (error) {
-        return [];
-    }
+function renderCategoryFilters(){
+const container=document.getElementById("categoryFilters");container.innerHTML="";
+categories.forEach(category=>{
+const button=document.createElement("button");
+button.className="category-button"+(activeCategory===category?" active":"");
+const labels={"Wszystkie":"📋 Wszystkie","Napoje":"🥤 Napoje","Jedzenie":"🌭 Jedzenie","Przekąski":"🍟 Przekąski","Słodycze":"🍫 Słodycze","Pozostałe":"📦 Pozostałe"};
+button.textContent=labels[category];
+button.onclick=()=>{activeCategory=category;renderCategoryFilters();renderProducts();};
+container.appendChild(button);
+});
 }
 
-let history = loadHistory();
-
-let receiptNumber = history.length > 0
-    ? Math.max(...history.map(t => Number(t.number) || 0)) + 1
-    : 1;
-
-function saveHistory() {
-    try {
-        localStorage.setItem("posHistory", JSON.stringify(history));
-        return true;
-    } catch (error) {
-        alert("Nie udało się zapisać historii sprzedaży.");
-        return false;
-    }
+function renderProducts(){
+const container=document.getElementById("products");container.innerHTML="";
+const filtered=activeCategory==="Wszystkie"?products:products.filter(p=>p.category===activeCategory);
+filtered.forEach(product=>{
+const button=document.createElement("button");
+button.className="product";
+button.disabled=product.stock<=0;
+const emoji=document.createElement("span");emoji.textContent=product.emoji;
+const name=document.createElement("strong");name.textContent=product.name;
+const price=document.createElement("div");price.textContent=money(product.price)+" zł";
+const stock=document.createElement("small");stock.className="stock-label";
+if(product.stock<=0){stock.textContent="BRAK W MAGAZYNIE";stock.classList.add("stock-empty");}
+else if(product.stock<=5){stock.textContent="Pozostało: "+product.stock+" szt. — MAŁO";stock.classList.add("stock-low");}
+else stock.textContent="Stan: "+product.stock+" szt.";
+button.append(emoji,name,price,stock);
+button.onclick=()=>addProduct(product);
+container.appendChild(button);
+});
+if(!filtered.length)container.innerHTML='<p class="empty">Brak produktów w tej kategorii.</p>';
 }
 
-
-// POMOCNICZE
-
-function money(value) {
-    return Number(value).toFixed(2).replace(".", ",");
+function addProduct(product){
+const current=products.find(p=>p.barcode===product.barcode);
+if(!current||current.stock<=0){
+document.getElementById("message").textContent="Brak produktu w magazynie!";
+return;
+}
+const inCart=cart.filter(p=>p.barcode===product.barcode).length;
+if(inCart>=current.stock){
+document.getElementById("message").textContent="W koszyku jest już cała dostępna ilość produktu!";
+return;
+}
+cart.push({...current});
+renderCart();
+document.getElementById("message").textContent="Dodano: "+product.name;
 }
 
-function escapeHtml(value) {
-    return String(value).replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-    })[char]);
+function scanProduct(){
+const code=document.getElementById("barcode").value.trim();
+const product=products.find(p=>p.barcode===code);
+if(product)addProduct(product);
+else document.getElementById("message").textContent="Nie znaleziono produktu!";
+document.getElementById("barcode").value="";
+}
+function removeProduct(index){cart.splice(index,1);renderCart();}
+function renderCart(){
+const container=document.getElementById("cart");container.innerHTML="";
+let total=0;
+if(!cart.length)container.innerHTML='<p class="empty">Koszyk jest pusty</p>';
+cart.forEach((product,index)=>{
+total+=product.price;
+const item=document.createElement("div");item.className="cart-item";
+const name=document.createElement("span");name.textContent=product.name+" – "+money(product.price)+" zł";
+const remove=document.createElement("button");remove.className="remove";remove.textContent="X";remove.onclick=()=>removeProduct(index);
+item.append(name,remove);container.appendChild(item);
+});
+document.getElementById("total").textContent=money(total);
+}
+function clearCart(){cart=[];renderCart();document.getElementById("message").textContent="Sprzedaż anulowana.";}
+
+function pay(method){
+if(!cart.length){document.getElementById("message").textContent="Koszyk jest pusty!";return;}
+const quantities={};
+cart.forEach(item=>quantities[item.barcode]=(quantities[item.barcode]||0)+1);
+for(const barcode in quantities){
+const product=products.find(p=>p.barcode===barcode);
+if(!product||product.stock<quantities[barcode]){
+document.getElementById("message").textContent="Za mało produktu w magazynie: "+(product?product.name:barcode);
+return;
+}
+}
+const soldItems=cart.map(item=>({...item}));
+const total=soldItems.reduce((sum,item)=>sum+item.price,0);
+const now=new Date();
+const transaction={number:receiptNumber,date:now.toLocaleDateString("pl-PL"),time:now.toLocaleTimeString("pl-PL"),method,items:soldItems,total};
+history.unshift(transaction);
+if(!saveHistory()){history.shift();return;}
+for(const barcode in quantities){
+const product=products.find(p=>p.barcode===barcode);
+product.stock-=quantities[barcode];
+}
+if(!saveProducts()){
+for(const barcode in quantities){
+const product=products.find(p=>p.barcode===barcode);
+if(product)product.stock+=quantities[barcode];
+}
+history.shift();saveHistory();return;
+}
+showReceipt(transaction);receiptNumber++;cart=[];renderCart();renderProducts();
+document.getElementById("message").textContent="Płatność zakończona pomyślnie!";
 }
 
+function showReceipt(transaction){
+const content=document.getElementById("receiptContent");
+let html=`<div class="receipt-title">SYMULATOR POS</div><p style="text-align:center">PARAGON DEMONSTRACYJNY</p><hr>Numer: ${transaction.number}<br>Data: ${transaction.date}<br>Godzina: ${transaction.time}<br>Stanowisko: 1<hr>`;
+transaction.items.forEach(item=>{html+=`<div class="receipt-line"><span>${escapeHtml(item.name)}</span><span>${money(item.price)} zł</span></div>`;});
+html+=`<hr><div class="receipt-total">RAZEM: ${money(transaction.total)} zł</div><p>Płatność: ${escapeHtml(transaction.method)}</p><hr><p style="text-align:center">DZIĘKUJEMY ZA ZAKUPY!</p><p style="text-align:center;font-size:12px">To nie jest dokument fiskalny.</p>`;
+content.innerHTML=html;document.getElementById("receiptWindow").style.display="block";
+}
+function closeReceipt(){document.getElementById("receiptWindow").style.display="none";}
 
-// LOGOWANIE
-
-function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    if (username === "pracownik" && password === "1234") {
-        currentRole = "pracownik";
-    } else if (username === "kierownik" && password === "5678") {
-        currentRole = "kierownik";
-    } else {
-        document.getElementById("loginMessage").textContent =
-            "Nieprawidłowy login lub hasło!";
-        return;
-    }
-
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("logoutButton").classList.remove("hidden");
-
-    document.getElementById("managerTab").classList.toggle(
-        "hidden",
-        currentRole !== "kierownik"
-    );
-
-    showPage("pos");
-    renderCategoryFilters();
-    renderProducts();
-    renderCart();
+function showPage(page){
+if(page==="manager"&&currentRole!=="kierownik")return;
+["pos","history","manager"].forEach(name=>document.getElementById(name+"Page").classList.toggle("hidden",name!==page));
+document.getElementById("posTab").classList.toggle("active",page==="pos");
+document.getElementById("historyTab").classList.toggle("active",page==="history");
+document.getElementById("managerTab").classList.toggle("active",page==="manager");
+if(page==="history")renderHistory();
+if(page==="manager")renderManager();
 }
 
-function logout() {
-    cart = [];
-    currentRole = "";
-
-    document.getElementById("app").classList.add("hidden");
-    document.getElementById("login").classList.remove("hidden");
-    document.getElementById("logoutButton").classList.add("hidden");
-
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("loginMessage").textContent = "";
-    document.getElementById("barcode").value = "";
-
-    document.getElementById("managerTab").classList.add("hidden");
-
-    cancelProductEdit();
-    closeReceipt();
-    renderCart();
+function renderHistory(){
+const container=document.getElementById("historyList");container.innerHTML="";
+document.getElementById("historyCount").textContent=history.length;
+const total=history.reduce((sum,t)=>sum+Number(t.total||0),0);
+document.getElementById("historyTotal").textContent=money(total)+" zł";
+if(!history.length){container.innerHTML='<div class="empty">Nie ma jeszcze żadnych transakcji.</div>';return;}
+history.forEach(transaction=>{
+const item=document.createElement("div");item.className="history-item";
+const heading=document.createElement("strong");heading.textContent="Transakcja #"+transaction.number;
+const info=document.createElement("p");info.textContent=transaction.date+" | "+transaction.time+" | "+transaction.method;
+const amount=document.createElement("p");amount.textContent="Kwota: "+money(transaction.total)+" zł";
+const detailsButton=document.createElement("button");detailsButton.textContent="SZCZEGÓŁY";
+const details=document.createElement("div");details.className="history-details hidden";
+transaction.items.forEach(product=>{const line=document.createElement("p");line.textContent=product.name+" – "+money(product.price)+" zł";details.appendChild(line);});
+detailsButton.onclick=()=>{details.classList.toggle("hidden");detailsButton.textContent=details.classList.contains("hidden")?"SZCZEGÓŁY":"UKRYJ SZCZEGÓŁY";};
+item.append(heading,info,amount,detailsButton,details);container.appendChild(item);
+});
 }
 
-
-// KATEGORIE NA KASIE
-
-function renderCategoryFilters() {
-    const container = document.getElementById("categoryFilters");
-    container.innerHTML = "";
-
-    categories.forEach(category => {
-        const button = document.createElement("button");
-        button.className = "category-button";
-
-        if (activeCategory === category) {
-            button.classList.add("active");
-        }
-
-        const labels = {
-            "Wszystkie": "📋 Wszystkie",
-            "Napoje": "🥤 Napoje",
-            "Jedzenie": "🌭 Jedzenie",
-            "Przekąski": "🍟 Przekąski",
-            "Słodycze": "🍫 Słodycze",
-            "Pozostałe": "📦 Pozostałe"
-        };
-
-        button.textContent = labels[category];
-        button.onclick = () => {
-            activeCategory = category;
-            renderCategoryFilters();
-            renderProducts();
-        };
-
-        container.appendChild(button);
-    });
+function renderManager(){
+const total=history.reduce((sum,t)=>sum+Number(t.total||0),0);
+const count=history.reduce((sum,t)=>sum+(Array.isArray(t.items)?t.items.length:0),0);
+const cash=history.filter(t=>t.method==="Gotówka").reduce((sum,t)=>sum+Number(t.total||0),0);
+const card=history.filter(t=>t.method==="Karta").reduce((sum,t)=>sum+Number(t.total||0),0);
+document.getElementById("managerCount").textContent=history.length;
+document.getElementById("managerTotal").textContent=money(total)+" zł";
+document.getElementById("managerProducts").textContent=count;
+document.getElementById("managerAverage").textContent=money(history.length?total/history.length:0)+" zł";
+document.getElementById("managerCash").textContent=money(cash)+" zł";
+document.getElementById("managerCard").textContent=money(card)+" zł";
+const counts={};
+history.forEach(t=>(t.items||[]).forEach(p=>counts[p.name]=(counts[p.name]||0)+1));
+const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+const top=document.getElementById("managerTopProducts");top.innerHTML="";
+if(!sorted.length)top.innerHTML='<p class="empty">Brak sprzedanych produktów.</p>';
+else sorted.forEach(([name,n])=>{const line=document.createElement("p");line.textContent=name+" – "+n+" szt.";top.appendChild(line);});
+renderManagerProducts();
+renderStockManager();
 }
 
-
-// KASA I PRODUKTY
-
-function renderProducts() {
-    const container = document.getElementById("products");
-    container.innerHTML = "";
-
-    const filteredProducts = activeCategory === "Wszystkie"
-        ? products
-        : products.filter(p => p.category === activeCategory);
-
-    filteredProducts.forEach(product => {
-        const button = document.createElement("button");
-        button.className = "product";
-
-        const emoji = document.createElement("span");
-        emoji.textContent = product.emoji;
-
-        const name = document.createElement("strong");
-        name.textContent = product.name;
-
-        const price = document.createElement("div");
-        price.textContent = money(product.price) + " zł";
-
-        button.appendChild(emoji);
-        button.appendChild(name);
-        button.appendChild(price);
-
-        button.onclick = () => addProduct(product);
-        container.appendChild(button);
-    });
-
-    if (filteredProducts.length === 0) {
-        container.innerHTML =
-            '<p class="empty">Brak produktów w tej kategorii.</p>';
-    }
+function renderStockManager(){
+const container=document.getElementById("stockManagerList");container.innerHTML="";
+let total=0,low=0,empty=0;
+products.forEach((product,index)=>{
+total+=product.stock;
+if(product.stock===0)empty++;
+else if(product.stock<=5)low++;
+const item=document.createElement("div");item.className="product-manager-item";
+const info=document.createElement("div");info.className="product-manager-info";
+const name=document.createElement("strong");name.textContent=product.emoji+" "+product.name;
+const amount=document.createElement("p");amount.textContent="Stan: "+product.stock+" szt.";
+if(product.stock===0)amount.classList.add("stock-empty");
+else if(product.stock<=5)amount.classList.add("stock-low");
+const input=document.createElement("input");input.type="number";input.min="0";input.step="1";input.value=product.stock;input.style.maxWidth="150px";input.setAttribute("aria-label","Nowy stan magazynowy "+product.name);
+const button=document.createElement("button");button.className="stock-button";button.textContent="ZAPISZ STAN";
+button.onclick=()=>updateStock(index,input.value);
+info.append(name,amount,input);
+item.append(info,button);container.appendChild(item);
+});
+document.getElementById("stockTotal").textContent=total;
+document.getElementById("stockLowCount").textContent=low;
+document.getElementById("stockEmptyCount").textContent=empty;
+if(!products.length)container.innerHTML='<p class="empty">Brak produktów.</p>';
 }
 
-function addProduct(product) {
-    cart.push({...product});
-    renderCart();
-
-    document.getElementById("message").textContent =
-        "Dodano: " + product.name;
+function updateStock(index,value){
+if(currentRole!=="kierownik")return;
+const amount=Number(value);
+if(!Number.isInteger(amount)||amount<0){alert("Podaj prawidłową ilość całkowitą, nie mniejszą niż 0.");renderStockManager();return;}
+products[index].stock=amount;
+if(!saveProducts()){products=loadProducts();return;}
+renderStockManager();renderProducts();
+document.getElementById("productMessage").textContent="Stan magazynowy został zaktualizowany.";
 }
 
-function scanProduct() {
-    const code = document.getElementById("barcode").value.trim();
-    const product = products.find(p => p.barcode === code);
-
-    if (product) {
-        addProduct(product);
-        document.getElementById("barcode").value = "";
-    } else {
-        document.getElementById("message").textContent =
-            "Nie znaleziono produktu!";
-    }
+function saveProduct(){
+if(currentRole!=="kierownik")return;
+const name=document.getElementById("productName").value.trim();
+const priceValue=document.getElementById("productPrice").value;
+const barcode=document.getElementById("productBarcode").value.trim();
+const emoji=document.getElementById("productEmoji").value.trim()||"🛒";
+const category=document.getElementById("productCategory").value;
+const stockValue=document.getElementById("productStock").value;
+const price=Number(priceValue),stock=Number(stockValue);
+if(!name||!priceValue||!barcode||stockValue===""){document.getElementById("productMessage").textContent="Uzupełnij wszystkie pola!";return;}
+if(!Number.isFinite(price)||price<0){document.getElementById("productMessage").textContent="Podaj prawidłową cenę!";return;}
+if(!Number.isInteger(stock)||stock<0){document.getElementById("productMessage").textContent="Ilość musi być liczbą całkowitą nie mniejszą niż 0!";return;}
+const duplicate=products.findIndex((p,i)=>p.barcode===barcode&&i!==editingProductIndex);
+if(duplicate!==-1){document.getElementById("productMessage").textContent="Ten kod kreskowy jest już przypisany!";return;}
+const oldStock=editingProductIndex!==-1?products[editingProductIndex].stock:undefined;
+const newProduct={name,price:Math.round(price*100)/100,barcode,emoji,category,stock};
+if(editingProductIndex===-1)products.push(newProduct);
+else products[editingProductIndex]=newProduct;
+if(!saveProducts()){
+if(editingProductIndex===-1)products.pop();
+else products[editingProductIndex].stock=oldStock;
+products=loadProducts();return;
+}
+document.getElementById("productMessage").textContent=editingProductIndex===-1?"Produkt został dodany!":"Produkt został zaktualizowany!";
+renderProducts();renderManagerProducts();renderStockManager();cancelProductEdit();
 }
 
-function removeProduct(index) {
-    cart.splice(index, 1);
-    renderCart();
+function renderManagerProducts(){
+const container=document.getElementById("managerProductList");container.innerHTML="";
+document.getElementById("productCount").textContent=products.length;
+if(!products.length){container.innerHTML='<p class="empty">Nie ma jeszcze żadnych produktów.</p>';return;}
+products.forEach((product,index)=>{
+const item=document.createElement("div");item.className="product-manager-item";
+const info=document.createElement("div");info.className="product-manager-info";
+const name=document.createElement("strong");name.textContent=product.emoji+" "+product.name;
+const price=document.createElement("p");price.textContent="Cena: "+money(product.price)+" zł";
+const barcode=document.createElement("p");barcode.textContent="Kod: "+product.barcode;
+const stock=document.createElement("p");stock.textContent="Magazyn: "+product.stock+" szt.";
+const category=document.createElement("span");category.className="category-label";category.textContent=product.category;
+info.append(name,price,barcode,stock,category);
+const actions=document.createElement("div");actions.className="product-manager-actions";
+const edit=document.createElement("button");edit.className="edit-button";edit.textContent="EDYTUJ";edit.onclick=()=>editProduct(index);
+const del=document.createElement("button");del.className="delete-button";del.textContent="USUŃ";del.onclick=()=>deleteProduct(index);
+actions.append(edit,del);item.append(info,actions);container.appendChild(item);
+});
 }
 
-function renderCart() {
-    const container = document.getElementById("cart");
-    container.innerHTML = "";
-
-    let total = 0;
-
-    if (cart.length === 0) {
-        container.innerHTML = '<p class="empty">Koszyk jest pusty</p>';
-    }
-
-    cart.forEach((product, index) => {
-        total += product.price;
-
-        const item = document.createElement("div");
-        item.className = "cart-item";
-
-        const name = document.createElement("span");
-        name.textContent = product.name + " – " + money(product.price) + " zł";
-
-        const remove = document.createElement("button");
-        remove.className = "remove";
-        remove.textContent = "X";
-        remove.onclick = () => removeProduct(index);
-
-        item.appendChild(name);
-        item.appendChild(remove);
-        container.appendChild(item);
-    });
-
-    document.getElementById("total").textContent = money(total);
+function editProduct(index){
+if(currentRole!=="kierownik")return;
+const p=products[index];if(!p)return;
+editingProductIndex=index;
+document.getElementById("productName").value=p.name;
+document.getElementById("productPrice").value=p.price;
+document.getElementById("productBarcode").value=p.barcode;
+document.getElementById("productEmoji").value=p.emoji;
+document.getElementById("productCategory").value=p.category;
+document.getElementById("productStock").value=p.stock;
+document.getElementById("productFormTitle").textContent="Edytuj produkt";
+document.getElementById("cancelEditButton").classList.remove("hidden");
+document.getElementById("productMessage").textContent="Edytujesz: "+p.name;
+document.getElementById("productName").focus();
 }
 
-function clearCart() {
-    cart = [];
-    renderCart();
-
-    document.getElementById("message").textContent =
-        "Sprzedaż anulowana.";
+function deleteProduct(index){
+if(currentRole!=="kierownik")return;
+const p=products[index];if(!p)return;
+if(!confirm("Czy na pewno chcesz usunąć produkt: "+p.name+"?"))return;
+products.splice(index,1);
+if(!saveProducts())products=loadProducts();
+if(editingProductIndex===index)cancelProductEdit();
+else if(editingProductIndex>index)editingProductIndex--;
+renderProducts();renderManagerProducts();renderStockManager();
+document.getElementById("productMessage").textContent="Produkt został usunięty.";
 }
 
-
-// PŁATNOŚĆ
-
-function pay(method) {
-    if (cart.length === 0) {
-        document.getElementById("message").textContent =
-            "Koszyk jest pusty!";
-        return;
-    }
-
-    const soldItems = cart.map(item => ({...item}));
-
-    const total = soldItems.reduce(
-        (sum, item) => sum + item.price, 0
-    );
-
-    const now = new Date();
-
-    const transaction = {
-        number: receiptNumber,
-        date: now.toLocaleDateString("pl-PL"),
-        time: now.toLocaleTimeString("pl-PL"),
-        method: method,
-        items: soldItems,
-        total: total
-    };
-
-    history.unshift(transaction);
-
-    if (!saveHistory()) {
-        history.shift();
-        return;
-    }
-
-    showReceipt(transaction);
-    receiptNumber++;
-
-    cart = [];
-    renderCart();
-
-    document.getElementById("message").textContent =
-        "Płatność zakończona pomyślnie!";
+function cancelProductEdit(){
+editingProductIndex=-1;
+document.getElementById("productName").value="";
+document.getElementById("productPrice").value="";
+document.getElementById("productBarcode").value="";
+document.getElementById("productEmoji").value="";
+document.getElementById("productCategory").value="Napoje";
+document.getElementById("productStock").value=20;
+document.getElementById("productFormTitle").textContent="Dodaj nowy produkt";
+document.getElementById("cancelEditButton").classList.add("hidden");
 }
-
-function showReceipt(transaction) {
-    const content = document.getElementById("receiptContent");
-
-    let html = `
-        <div class="receipt-title">SYMULATOR POS</div>
-        <p style="text-align:center">PARAGON DEMONSTRACYJNY</p>
-        <hr>
-        Numer: ${transaction.number}<br>
-        Data: ${transaction.date}<br>
-        Godzina: ${transaction.time}<br>
-        Stanowisko: 1
-        <hr>
-    `;
-
-    transaction.items.forEach(item => {
-        html += `
-            <div class="receipt-line">
-                <span>${escapeHtml(item.name)}</span>
-                <span>${money(item.price)} zł</span>
-            </div>
-        `;
-    });
-
-    html += `
-        <hr>
-        <div class="receipt-total">
-            RAZEM: ${money(transaction.total)} zł
-        </div>
-        <p>Płatność: ${escapeHtml(transaction.method)}</p>
-        <hr>
-        <p style="text-align:center">DZIĘKUJEMY ZA ZAKUPY!</p>
-        <p style="text-align:center;font-size:12px">
-            To nie jest dokument fiskalny.
-        </p>
-    `;
-
-    content.innerHTML = html;
-    document.getElementById("receiptWindow").style.display = "block";
-}
-
-function closeReceipt() {
-    document.getElementById("receiptWindow").style.display = "none";
-}
-
-
-// NAWIGACJA
-
-function showPage(page) {
-    if (page === "manager" && currentRole !== "kierownik") {
-        return;
-    }
-
-    const pages = ["pos", "history", "manager"];
-
-    pages.forEach(name => {
-        document.getElementById(name + "Page")
-            .classList.toggle("hidden", name !== page);
-    });
-
-    document.getElementById("posTab").classList.toggle("active", page === "pos");
-    document.getElementById("historyTab").classList.toggle("active", page === "history");
-    document.getElementById("managerTab").classList.toggle("active", page === "manager");
-
-    if (page === "history") renderHistory();
-    if (page === "manager") renderManager();
-}
-
-
-// HISTORIA
-
-function renderHistory() {
-    const container = document.getElementById("historyList");
-    container.innerHTML = "";
-
-    document.getElementById("historyCount").textContent = history.length;
-
-    const totalSales = history.reduce(
-        (sum, transaction) => sum + Number(transaction.total || 0), 0
-    );
-
-    document.getElementById("historyTotal").textContent =
-        money(totalSales) + " zł";
-
-    if (history.length === 0) {
-        container.innerHTML =
-            '<div class="empty">Nie ma jeszcze żadnych transakcji.</div>';
-        return;
-    }
-
-    history.forEach(transaction => {
-        const item = document.createElement("div");
-        item.className = "history-item";
-
-        const heading = document.createElement("strong");
-        heading.textContent = "Transakcja #" + transaction.number;
-
-        const info = document.createElement("p");
-        info.textContent =
-            transaction.date + " | " + transaction.time +
-            " | " + transaction.method;
-
-        const amount = document.createElement("p");
-        amount.textContent = "Kwota: " + money(transaction.total) + " zł";
-
-        const detailsButton = document.createElement("button");
-        detailsButton.textContent = "SZCZEGÓŁY";
-
-        const details = document.createElement("div");
-        details.className = "history-details hidden";
-
-        transaction.items.forEach(product => {
-            const line = document.createElement("p");
-            line.textContent =
-                product.name + " – " + money(product.price) + " zł";
-            details.appendChild(line);
-        });
-
-        detailsButton.onclick = () => {
-            details.classList.toggle("hidden");
-            detailsButton.textContent = details.classList.contains("hidden")
-                ? "SZCZEGÓŁY"
-                : "UKRYJ SZCZEGÓŁY";
-        };
-
-        item.appendChild(heading);
-        item.appendChild(info);
-        item.appendChild(amount);
-        item.appendChild(detailsButton);
-        item.appendChild(details);
-
-        container.appendChild(item);
-    });
-}
-
-
-// PANEL KIEROWNIKA - STATYSTYKI
-
-function renderManager() {
-    const total = history.reduce(
-        (sum, transaction) => sum + Number(transaction.total || 0), 0
-    );
-
-    const productCount = history.reduce(
-        (sum, transaction) => sum +
-            (Array.isArray(transaction.items) ? transaction.items.length : 0),
-        0
-    );
-
-    const cash = history
-        .filter(t => t.method === "Gotówka")
-        .reduce((sum, t) => sum + Number(t.total || 0), 0);
-
-    const card = history
-        .filter(t => t.method === "Karta")
-        .reduce((sum, t) => sum + Number(t.total || 0), 0);
-
-    const average = history.length > 0 ? total / history.length : 0;
-
-    document.getElementById("managerCount").textContent = history.length;
-    document.getElementById("managerTotal").textContent = money(total) + " zł";
-    document.getElementById("managerProducts").textContent = productCount;
-    document.getElementById("managerAverage").textContent = money(average) + " zł";
-    document.getElementById("managerCash").textContent = money(cash) + " zł";
-    document.getElementById("managerCard").textContent = money(card) + " zł";
-
-    const counts = {};
-
-    history.forEach(transaction => {
-        transaction.items.forEach(product => {
-            counts[product.name] = (counts[product.name] || 0) + 1;
-        });
-    });
-
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-
-    const container = document.getElementById("managerTopProducts");
-    container.innerHTML = "";
-
-    if (sorted.length === 0) {
-        container.innerHTML = '<p class="empty">Brak sprzedanych produktów.</p>';
-    } else {
-        sorted.forEach(([name, count]) => {
-            const line = document.createElement("p");
-            line.textContent = name + " – " + count + " szt.";
-            container.appendChild(line);
-        });
-    }
-
-    renderManagerProducts();
-}
-
-
-// ZARZĄDZANIE PRODUKTAMI
-
-function saveProduct() {
-    if (currentRole !== "kierownik") return;
-
-    const name = document.getElementById("productName").value.trim();
-    const priceValue = document.getElementById("productPrice").value;
-    const barcode = document.getElementById("productBarcode").value.trim();
-    const emoji = document.getElementById("productEmoji").value.trim() || "🛒";
-    const category = document.getElementById("productCategory").value;
-
-    const price = Number(priceValue);
-
-    if (!name || !priceValue || !barcode) {
-        document.getElementById("productMessage").textContent =
-            "Uzupełnij nazwę, cenę i kod kreskowy!";
-        return;
-    }
-
-    if (!Number.isFinite(price) || price < 0) {
-        document.getElementById("productMessage").textContent =
-            "Podaj prawidłową cenę!";
-        return;
-    }
-
-    const duplicate = products.findIndex((product, index) =>
-        product.barcode === barcode && index !== editingProductIndex
-    );
-
-    if (duplicate !== -1) {
-        document.getElementById("productMessage").textContent =
-            "Ten kod kreskowy jest już przypisany do innego produktu!";
-        return;
-    }
-
-    const newProduct = {
-        name: name,
-        price: Math.round(price * 100) / 100,
-        barcode: barcode,
-        emoji: emoji,
-        category: category
-    };
-
-    if (editingProductIndex === -1) {
-        products.push(newProduct);
-        document.getElementById("productMessage").textContent =
-            "Produkt został dodany!";
-    } else {
-        products[editingProductIndex] = newProduct;
-        document.getElementById("productMessage").textContent =
-            "Produkt został zaktualizowany!";
-    }
-
-    if (!saveProducts()) {
-        products = loadProducts();
-        renderProducts();
-        renderManagerProducts();
-        return;
-    }
-
-    renderProducts();
-    renderManagerProducts();
-    cancelProductEdit();
-}
-
-function renderManagerProducts() {
-    const container = document.getElementById("managerProductList");
-    container.innerHTML = "";
-
-    document.getElementById("productCount").textContent = products.length;
-
-    if (products.length === 0) {
-        container.innerHTML = '<p class="empty">Nie ma jeszcze żadnych produktów.</p>';
-        return;
-    }
-
-    products.forEach((product, index) => {
-        const item = document.createElement("div");
-        item.className = "product-manager-item";
-
-        const info = document.createElement("div");
-        info.className = "product-manager-info";
-
-        const name = document.createElement("strong");
-        name.textContent = product.emoji + " " + product.name;
-
-        const price = document.createElement("p");
-        price.textContent = "Cena: " + money(product.price) + " zł";
-
-        const barcode = document.createElement("p");
-        barcode.textContent = "Kod: " + product.barcode;
-
-        const category = document.createElement("span");
-        category.className = "category-label";
-        category.textContent = product.category;
-
-        info.appendChild(name);
-        info.appendChild(price);
-        info.appendChild(barcode);
-        info.appendChild(category);
-
-        const actions = document.createElement("div");
-        actions.className = "product-manager-actions";
-
-        const editButton = document.createElement("button");
-        editButton.className = "edit-button";
-        editButton.textContent = "EDYTUJ";
-        editButton.onclick = () => editProduct(index);
-
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button";
-        deleteButton.textContent = "USUŃ";
-        deleteButton.onclick = () => deleteProduct(index);
-
-        actions.appendChild(editButton);
-        actions.appendChild(deleteButton);
-
-        item.appendChild(info);
-        item.appendChild(actions);
-        container.appendChild(item);
-    });
-}
-
-function editProduct(index) {
-    if (currentRole !== "kierownik") return;
-
-    const product = products[index];
-    if (!product) return;
-
-    editingProductIndex = index;
-
-    document.getElementById("productName").value = product.name;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productBarcode").value = product.barcode;
-    document.getElementById("productEmoji").value = product.emoji;
-    document.getElementById("productCategory").value = product.category;
-
-    document.getElementById("productFormTitle").textContent = "Edytuj produkt";
-    document.getElementById("cancelEditButton").classList.remove("hidden");
-    document.getElementById("productMessage").textContent =
-        "Edytujesz: " + product.name;
-
-    document.getElementById("productName").focus();
-}
-
-function deleteProduct(index) {
-    if (currentRole !== "kierownik") return;
-
-    const product = products[index];
-    if (!product) return;
-
-    if (!confirm("Czy na pewno chcesz usunąć produkt: " + product.name + "?")) {
-        return;
-    }
-
-    products.splice(index, 1);
-
-    if (!saveProducts()) {
-        products = loadProducts();
-    }
-
-    if (editingProductIndex === index) {
-        cancelProductEdit();
-    } else if (editingProductIndex > index) {
-        editingProductIndex--;
-    }
-
-    renderProducts();
-    renderManagerProducts();
-
-    document.getElementById("productMessage").textContent =
-        "Produkt został usunięty.";
-}
-
-function cancelProductEdit() {
-    editingProductIndex = -1;
-
-    document.getElementById("productName").value = "";
-    document.getElementById("productPrice").value = "";
-    document.getElementById("productBarcode").value = "";
-    document.getElementById("productEmoji").value = "";
-    document.getElementById("productCategory").value = "Napoje";
-
-    document.getElementById("productFormTitle").textContent =
-        "Dodaj nowy produkt";
-
-    document.getElementById("cancelEditButton").classList.add("hidden");
-}
-
 </script>
-
 </body>
 </html>
