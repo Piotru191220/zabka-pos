@@ -72,7 +72,7 @@ button {
     margin-top: 12px;
 }
 
-#error, .error { color: #d00; }
+#error { color: #d00; }
 
 #pos {
     display: none;
@@ -198,6 +198,52 @@ button {
     color: #008f43;
 }
 
+/* PARAGON */
+
+#receiptWindow {
+    display: none;
+    background: white;
+    color: #222;
+    max-width: 370px;
+    margin: 20px auto;
+    padding: 22px;
+    border: 1px dashed #aaa;
+    border-radius: 5px;
+    font-family: monospace;
+}
+
+.receipt-title {
+    text-align: center;
+    line-height: 1.5;
+}
+
+.receipt-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 0;
+}
+
+.receipt-total {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.receipt-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.receipt-actions button {
+    width: 100%;
+}
+
+.receipt-close {
+    background: #e9eeee;
+}
+
 @media(max-width: 800px) {
     .pos-layout { grid-template-columns: 1fr; }
     .product-grid { grid-template-columns: repeat(2, 1fr); }
@@ -205,6 +251,32 @@ button {
 
 @media(max-width: 400px) {
     .scan-area { flex-direction: column; }
+}
+
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    #receiptWindow, #receiptWindow * {
+        visibility: visible !important;
+    }
+
+    #receiptWindow {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    .receipt-actions {
+        display: none !important;
+    }
 }
 </style>
 </head>
@@ -261,7 +333,6 @@ button {
             </div>
 
             <div id="scanMessage"></div>
-
             <div class="product-grid" id="productGrid"></div>
         </section>
 
@@ -286,6 +357,21 @@ button {
             </button>
 
             <p id="message"></p>
+
+            <div id="receiptWindow">
+                <div id="receiptContent"></div>
+
+                <div class="receipt-actions">
+                    <button class="pay" onclick="window.print()">
+                        DRUKUJ PARAGON
+                    </button>
+
+                    <button class="receipt-close"
+                    onclick="closeReceipt()">
+                        ZAMKNIJ
+                    </button>
+                </div>
+            </div>
         </section>
     </div>
 </div>
@@ -304,6 +390,7 @@ const products = [
 ];
 
 let cart = [];
+let receiptNumber = 1;
 
 function showLogin() {
     document.getElementById("loginBox").style.display = "block";
@@ -339,6 +426,7 @@ function logout() {
     document.getElementById("barcode").value = "";
     document.getElementById("scanMessage").textContent = "";
     document.getElementById("message").textContent = "";
+    closeReceipt();
 
     renderCart();
 }
@@ -434,19 +522,67 @@ function pay(method) {
         return;
     }
 
-    const total = cart.reduce((sum,p) => sum + p.price,0);
+    const soldItems = [...cart];
+    const total = soldItems.reduce((sum,p) => sum + p.price,0);
 
-    alert(
-        "SPRZEDAŻ ZAKOŃCZONA\n\n" +
-        "Kwota: " + total.toFixed(2) + " zł\n" +
-        "Płatność: " + method
-    );
+    const date = new Date();
+    const dateText = date.toLocaleDateString("pl-PL");
+    const timeText = date.toLocaleTimeString("pl-PL");
 
+    const items = soldItems.map(p => `
+        <div class="receipt-line">
+            <span>${p.name}</span>
+            <span>${p.price.toFixed(2)} zł</span>
+        </div>
+    `).join("");
+
+    document.getElementById("receiptContent").innerHTML = `
+        <div class="receipt-title">
+            <h2>ŻABKA</h2>
+            <p>SKLEP DEMONSTRACYJNY</p>
+            <p>PARAGON – SYMULACJA</p>
+        </div>
+
+        <hr>
+
+        <p>Numer paragonu: ${String(receiptNumber).padStart(4,"0")}</p>
+        <p>Data: ${dateText}</p>
+        <p>Godzina: ${timeText}</p>
+        <p>Stanowisko: 01</p>
+
+        <hr>
+
+        ${items}
+
+        <hr>
+
+        <div class="receipt-line receipt-total">
+            <span>RAZEM:</span>
+            <span>${total.toFixed(2)} zł</span>
+        </div>
+
+        <p>Forma płatności: ${method}</p>
+
+        <hr>
+
+        <div class="receipt-title">
+            <p>DZIĘKUJEMY ZA ZAKUPY!</p>
+            <p>To nie jest dokument fiskalny.</p>
+        </div>
+    `;
+
+    document.getElementById("receiptWindow").style.display = "block";
+
+    receiptNumber++;
     cart = [];
     renderCart();
 
     document.getElementById("message").textContent =
         "Sprzedaż zakończona pomyślnie!";
+}
+
+function closeReceipt() {
+    document.getElementById("receiptWindow").style.display = "none";
 }
 </script>
 
