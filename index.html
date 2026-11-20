@@ -1,83 +1,156 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Żabka | Panel sklepu</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Żabka POS</title>
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f5f3;
-            color: #222;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        header {
-            background: #009640;
-            color: white;
-            padding: 22px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f5f3;
+    color: #222;
+}
 
-        .logo {
-            font-size: 30px;
-            font-weight: bold;
-        }
+header {
+    background: #009640;
+    color: white;
+    padding: 22px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .login-button {
-            background: white;
-            color: #009640;
-            border: none;
-            padding: 13px 25px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
 
-        .hero {
-            text-align: center;
-            padding: 100px 20px;
-        }
+button {
+    cursor: pointer;
+}
 
-        .hero h1 {
-            font-size: 42px;
-        }
+.login-button {
+    background: white;
+    color: #009640;
+    border: none;
+    padding: 13px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
 
-        .hero p {
-            color: #666;
-            font-size: 18px;
-        }
+.hero {
+    text-align: center;
+    padding: 100px 20px;
+}
 
-        footer {
-            text-align: center;
-            padding: 25px;
-            color: #777;
-        }
-    </style>
+.hero h1 {
+    font-size: 42px;
+}
+
+.hero p {
+    color: #666;
+    font-size: 18px;
+}
+
+.login-box {
+    display: none;
+    background: white;
+    max-width: 380px;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px #0001;
+}
+
+.login-box h2 {
+    text-align: center;
+    color: #009640;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 13px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 15px;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 14px;
+    background: #009640;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#error {
+    color: red;
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #777;
+}
+</style>
 </head>
+
 <body>
 
 <header>
     <div class="logo">ŻABKA</div>
-    <button class="login-button">Zaloguj się</button>
+    <button class="login-button" onclick="showLogin()">
+        Zaloguj się
+    </button>
 </header>
 
 <main class="hero">
     <h1>Witamy w naszym sklepie!</h1>
     <p>Panel obsługi sklepu i system kasowy POS.</p>
+
+    <div class="login-box" id="loginBox">
+        <h2>Logowanie pracownika</h2>
+
+        <input type="text" id="username"
+        placeholder="Login pracownika">
+
+        <input type="password" id="password"
+        placeholder="Hasło">
+
+        <button class="submit-button" onclick="login()">
+            Zaloguj się
+        </button>
+
+        <p id="error"></p>
+    </div>
 </main>
 
 <footer>
     © 2026 Żabka POS – projekt demonstracyjny
 </footer>
+
+<script>
+function showLogin() {
+    document.getElementById("loginBox").style.display = "block";
+}
+
+function login() {
+    document.getElementById("error").textContent =
+        "System logowania zostanie skonfigurowany w kolejnym kroku.";
+}
+</script>
 
 </body>
 </html>
